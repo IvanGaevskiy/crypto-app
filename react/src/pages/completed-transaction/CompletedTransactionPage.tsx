@@ -4,5 +4,5 @@ export const CompletedTransactionPage = () => {
       <h1>Completed Transaction Page</h1>
       <p>This is the completed transaction page.</p>
     </div>
-  );
+  )
 }

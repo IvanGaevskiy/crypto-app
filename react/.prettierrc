@@ -1,0 +1,33 @@
+{
+  "trailingComma": "none",
+  "tabWidth": 2,
+  "semi": false,
+  "singleQuote": true,
+  "importOrder": [
+    "^(react|next|react-router-dom|react-dom)(/.*)?$",
+    "^(react-.*|next-.*|zod|zustand|clsx|date-fns|lodash|@hookform|@tanstack|i18next|i18next-.*)",
+    "^(@headlessui|@react-aria|@floating-ui|@googlemaps|axios)",
+    "^@/api/(.*)$",
+    "^@/pages/(.*)$",
+    "^@/shared/(.*)$",
+    "^@/components/(.*)$",
+    "^[./]",
+    "^.*\\.s?css$",
+    "^.*\\.svg$",
+    ".*"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+  "tailwindAttributes": [
+    "className",
+    "enter",
+    "enterFrom",
+    "enterTo",
+    "leave",
+    "leaveFrom",
+    "leaveTo"
+  ],
+  "printWidth": 100,
+  "tailwindFunctions": ["clsx"]
+}

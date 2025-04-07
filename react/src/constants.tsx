@@ -3,4 +3,8 @@ export type CurrencyOption = {
   value: string
 }
 
-export const CURRENCY_OPTIONS: CurrencyOption[] = [{ title: "BTC", value: "btc" }, { title: "ETH", value: "eth" }, { title: "USDT", value: "usdt" }]
+export const CURRENCY_OPTIONS: CurrencyOption[] = [
+  { title: 'BTC', value: 'btc' },
+  { title: 'ETH', value: 'eth' },
+  { title: 'USDT', value: 'usdt' }
+]

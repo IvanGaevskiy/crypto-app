@@ -1,13 +1,12 @@
-import './App.css'
-import { BrowserRouter, Routes, Route } from "react-router"
-import { NotFoundPage } from './components/NotFoundPage'
-import { MainLayout } from './MainLayout'
-import { ExchangePage } from './pages/exchange/ExchangePage'
-import { CompletedTransactionPage } from './pages/completed-transaction/CompletedTransactionPage'
+import { BrowserRouter, Route, Routes } from 'react-router'
 
+import './App.css'
+import { MainLayout } from './MainLayout'
+import { NotFoundPage } from './components/NotFoundPage'
+import { CompletedTransactionPage } from './pages/completed-transaction/CompletedTransactionPage'
+import { ExchangePage } from './pages/exchange/ExchangePage'
 
 function App() {
-  
   return (
     <BrowserRouter>
       <Routes>
