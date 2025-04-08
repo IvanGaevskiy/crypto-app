@@ -9,9 +9,8 @@ type InputProps = HTMLProps<HTMLInputElement> & {
 export const Input = ({ className, ...rest }: InputProps) => {
   return (
     <input
-      placeholder="Enter text"
       className={clsx(
-        'rounded-md border border-gray-300 bg-transparent p-2 transition-colors focus:border-blue-500 focus:outline-none',
+        'rounded-lg border bg-transparent p-2 px-4 transition-colors focus:outline-none',
         className
       )}
       {...rest}

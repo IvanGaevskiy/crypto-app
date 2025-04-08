@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import clsx from 'clsx'
+
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 import { CURRENCY_OPTIONS, CurrencyOption } from '../constants'
@@ -16,37 +18,71 @@ export const CurrencyPopover = ({
 }: CurrencyPopoverProps) => {
   const [inputValue, setInputValue] = useState<string>('')
 
-  const buttonText = CURRENCY_OPTIONS.find((option) => option.value === selectedOptionValue)?.title
-
+  const { twText, title } =
+    CURRENCY_OPTIONS.find((option) => option.value === selectedOptionValue) || {}
   const displayedOptions = CURRENCY_OPTIONS.filter((option) =>
     option.title.toLowerCase().includes(inputValue.toLowerCase())
   )
 
+  const isLastOption = (array: CurrencyOption[], option: CurrencyOption) => {
+    const last = array[array.length - 1]
+    return last === option
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setInputValue(value === '' ? '0.0000' : value)
+  }
+
   return (
     <Popover>
       <PopoverButton
-        as="div"
-        className="absolute top-1/2 right-[12px] flex h-8 w-[50px] -translate-y-1/2 cursor-pointer items-end justify-center rounded-lg !bg-[#826e17] px-3 py-2 text-[14px] leading-5"
+        className={clsx(
+          'absolute top-1/2 right-2 flex h-8',
+          '-translate-y-1 cursor-pointer items-end justify-center',
+          'rounded-lg px-3 py-2 text-2xl leading-5 hover:opacity-90',
+          twText
+        )}
       >
-        {buttonText}
+        {title}
       </PopoverButton>
-      <PopoverPanel className="absolute top-0 flex w-full flex-col gap-6 rounded-lg border border-gray-300 bg-white p-4 text-black shadow-lg">
+      <PopoverPanel
+        className={clsx(
+          'absolute top-6 flex w-full flex-col rounded-lg',
+          'bg-[#21284b] shadow-lg',
+          twText
+        )}
+      >
         <Input
+          placeholder="Введите название или тикер"
+          className="h-14 w-80 border-[#21284b]"
           value={inputValue}
-          onChange={({ target }) => setInputValue((target as HTMLInputElement).value)}
+          onChange={handleChange}
         />
-
-        <div className="flex flex-col gap-3">
+        <div className="mx-4 border-b-1 border-b-[#495077]" />
+        <div className="mt-2 flex flex-col">
           {displayedOptions.map((option) => (
-            <PopoverButton
-              key={option.value}
-              className="bg-gray-[#aea6a6] rounded-lg p-2 text-white hover:bg-gray-300"
-              onClick={() => {
-                setSelectedOption(option)
-              }}
-            >
-              {option.title}
-            </PopoverButton>
+            <div>
+              <PopoverButton
+                key={option.value}
+                className={clsx(
+                  'w-full cursor-pointer bg-[#21284b] p-2 px-4 text-left hover:bg-[#29315c]',
+                  option.twText,
+                  isLastOption(displayedOptions, option) ? 'rounded-b-lg' : ''
+                )}
+                onClick={() => {
+                  setSelectedOption(option)
+                }}
+              >
+                {option.title}
+              </PopoverButton>
+              <div
+                className={clsx(
+                  'mx-4 border-b-1 border-b-[#29315c]',
+                  isLastOption(displayedOptions, option) ? 'hidden' : ''
+                )}
+              />
+            </div>
           ))}
         </div>
       </PopoverPanel>
