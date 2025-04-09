@@ -8,20 +8,20 @@ import { CURRENCY_OPTIONS, CurrencyOption } from '../constants'
 import { Input } from './Input'
 
 type CurrencyPopoverProps = {
-  selectedOptionValue: string
+  selectedOptionCurrency: string
   setSelectedOption: (value: CurrencyOption) => void
 }
 
 export const CurrencyPopover = ({
-  selectedOptionValue,
+  selectedOptionCurrency,
   setSelectedOption
 }: CurrencyPopoverProps) => {
   const [inputValue, setInputValue] = useState<string>('')
 
-  const { twText, title } =
-    CURRENCY_OPTIONS.find((option) => option.value === selectedOptionValue) || {}
+  const { twText, currency } =
+    CURRENCY_OPTIONS.find((option) => option.currency === selectedOptionCurrency) || {}
   const displayedOptions = CURRENCY_OPTIONS.filter((option) =>
-    option.title.toLowerCase().includes(inputValue.toLowerCase())
+    option.currency.toLowerCase().includes(inputValue.toLowerCase())
   )
 
   const isLastOption = (array: CurrencyOption[], option: CurrencyOption) => {
@@ -31,20 +31,20 @@ export const CurrencyPopover = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    setInputValue(value === '' ? '0.0000' : value)
+    setInputValue(value)
   }
 
   return (
     <Popover>
       <PopoverButton
         className={clsx(
-          'absolute top-1/2 right-2 flex h-8',
+          'absolute top-1/2 right-2 flex h-8 focus:outline-none',
           '-translate-y-1 cursor-pointer items-end justify-center',
           'rounded-lg px-3 py-2 text-2xl leading-5 hover:opacity-90',
           twText
         )}
       >
-        {title}
+        {currency}
       </PopoverButton>
       <PopoverPanel
         className={clsx(
@@ -64,9 +64,9 @@ export const CurrencyPopover = ({
           {displayedOptions.map((option) => (
             <div>
               <PopoverButton
-                key={option.value}
+                key={option.currency}
                 className={clsx(
-                  'w-full cursor-pointer bg-[#21284b] p-2 px-4 text-left hover:bg-[#29315c]',
+                  'w-full cursor-pointer bg-[#21284b] p-2 hover:bg-[#29315c]',
                   option.twText,
                   isLastOption(displayedOptions, option) ? 'rounded-b-lg' : ''
                 )}
@@ -74,7 +74,21 @@ export const CurrencyPopover = ({
                   setSelectedOption(option)
                 }}
               >
-                {option.title}
+                <div className="flex justify-between px-4">
+                  <div>{`${option.issuer || ''}(${option.blockchain})`}</div>
+                  <div className="flex flex-col">
+                    <div>{option.currency}</div>
+                    <div
+                      className={clsx(
+                        `ml-auto inline-block h-4 rounded-md px-2 text-xs`,
+                        option.twBgIssuer,
+                        option.twTextIssuer
+                      )}
+                    >
+                      {option.network}
+                    </div>
+                  </div>
+                </div>
               </PopoverButton>
               <div
                 className={clsx(

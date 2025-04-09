@@ -10,7 +10,7 @@ export const ExchangePage = () => {
   // const [selectedOption2, setSelectedOption2] = useState(CURRENCY_OPTIONS[1])
   const [inputValue, setInputValue] = useState<string>('')
 
-  const { name, twText, twBorder } = selectedOption
+  const { currency, twText, twBorder } = selectedOption
   // const { name: name2, twText: twText2, twBorder: twBorder2 } = selectedOption2
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +26,7 @@ export const ExchangePage = () => {
         <label className={clsx("flex flex-col space-y-1", twText)}>
           <div className="flex justify-between px-4">
             <div>Отправляете</div>
-            <div>{name}</div>
+            <div>{currency}</div>
           </div>
           <Input
             className={`h-14 w-80 !bg-[#000000b0] text-2xl ${twBorder} ${twText}`}
@@ -34,7 +34,7 @@ export const ExchangePage = () => {
             onChange={handleChange}
           />
           <CurrencyPopover
-            selectedOptionValue={selectedOption.value}
+            selectedOptionCurrency={selectedOption.currency}
             setSelectedOption={setSelectedOption}
           />
         </label>
