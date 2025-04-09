@@ -10,8 +10,7 @@ body,
 
 #root {
   width: 100%;
-  background: linear-gradient(#151b22, #2f3376);
-  /* background: url(/5002f19b145911f08a0ec69e8a5adaee_1.jpeg) no-repeat; */
+  background: url(../src/assets/body.svg) no-repeat top/cover;
   text-align: center;
   display: flex;
   flex-direction: column;

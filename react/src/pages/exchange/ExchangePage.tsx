@@ -24,7 +24,7 @@ export const ExchangePage = () => {
       <p>This is the exchange page.</p> */}
       <div className="relative">
         <label className={clsx("flex flex-col space-y-1", twText)}>
-          <div className="flex justify-between px-4">
+          <div className="flex justify-between px-4 font-semibold">
             <div>Отправляете</div>
             <div>{currency}</div>
           </div>

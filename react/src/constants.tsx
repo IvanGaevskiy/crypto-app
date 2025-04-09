@@ -1,3 +1,4 @@
+
 export type CurrencyOption = {
   currency: string
   blockchain: string
@@ -5,6 +6,7 @@ export type CurrencyOption = {
   issuer?: string
   twBgIssuer?: string
   twTextIssuer?: string
+  svgNetwork?: string
   svg: string
   twText: string
   twBorder: string
@@ -15,7 +17,7 @@ export const CURRENCY_OPTIONS: CurrencyOption[] = [
   {
     currency: 'BTC',
     svg: 'bitcoin.svg',
-    blockchain: 'Bitcoin',
+    blockchain: 'bitcoin',
     twText: 'text-[#f7931a]',
     twBorder: 'border-[#f7931a]',
     twFocusBorder: 'focus:border-[#f7931a]'
@@ -27,6 +29,7 @@ export const CURRENCY_OPTIONS: CurrencyOption[] = [
     issuer: 'Tether',
     twBgIssuer: 'bg-white',
     twTextIssuer: 'text-black',
+    svgNetwork: 'networkEtherium.svg',
     svg: 'tether.svg',
     twText: 'text-[#26a17b]',
     twBorder: 'border-[#26a17b]',
