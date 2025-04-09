@@ -8,6 +8,7 @@ import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 import { CURRENCY_OPTIONS, CurrencyOption } from '../constants'
 import { Input } from './Input'
+import { getPath } from '../utils/getPath'
 
 type CurrencyPopoverProps = {
   selectedOptionCurrency: string
@@ -39,13 +40,6 @@ export const CurrencyPopover = ({
     setInputValue(value)
   }
 
-  const getCurrencySvgPath = (svg: string | undefined) => {
-    if (typeof svg == 'undefined') {
-      return ''
-    }
-    return new URL(`../assets/${svg}`, import.meta.url).href
-  }
-
   return (
     <Popover>
       <PopoverButton
@@ -57,7 +51,7 @@ export const CurrencyPopover = ({
         )}
       >
         <div className="flex items-center justify-center">
-          <ReactSVG src={getCurrencySvgPath(currencySvg)} className="mr-1 h-[24px] w-[24px]" />
+          <ReactSVG src={getPath(currencySvg)} className="mr-1 h-[24px] w-[24px]" />
           <div>{currency}</div>
         </div>
       </PopoverButton>
@@ -94,7 +88,7 @@ export const CurrencyPopover = ({
                 <div className="flex justify-between px-4">
                   <div className="flex items-center justify-center">
                     <ReactSVG
-                      src={getCurrencySvgPath(option.svg)}
+                      src={getPath(option.svg)}
                       className="mr-1 h-[24px] w-[24px]"
                     />
                     <div>{`${option.issuer || ''}(${option.blockchain})`}</div>
@@ -110,7 +104,7 @@ export const CurrencyPopover = ({
                     >
                       <div className="flex items-center justify-center">
                         <ReactSVG
-                          src={getCurrencySvgPath(option.svgNetwork)}
+                          src={getPath(option.svgNetwork)}
                           className="h-[14px] w-[14px]"
                         />
                         <div>{option.network}</div>
