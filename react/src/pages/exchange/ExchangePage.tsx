@@ -22,7 +22,7 @@ export const ExchangePage = () => {
   const handleChange = (setFunc: (value: string) => void) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
-      setFunc(value === '' ? '0.0000' : value)
+      setFunc(value)
     }
   }
 
