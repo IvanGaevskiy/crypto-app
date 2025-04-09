@@ -1,4 +1,3 @@
-
 export type CurrencyOption = {
   currency: string
   blockchain: string

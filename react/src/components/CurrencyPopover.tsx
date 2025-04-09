@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import React from 'react'
 
 import clsx from 'clsx'
@@ -7,8 +7,8 @@ import { ReactSVG } from 'react-svg'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 import { CURRENCY_OPTIONS, CurrencyOption } from '../constants'
-import { Input } from './Input'
 import { getPath } from '../utils/getPath'
+import { Input } from './Input'
 
 type CurrencyPopoverProps = {
   selectedOptionCurrency: string
@@ -26,14 +26,10 @@ export const CurrencyPopover = ({
     currency,
     svg: currencySvg
   } = CURRENCY_OPTIONS.find((option) => option.currency === selectedOptionCurrency) || {}
+
   const displayedOptions = CURRENCY_OPTIONS.filter((option) =>
     option.currency.toLowerCase().includes(inputValue.toLowerCase())
   )
-
-  const isLastOption = (array: CurrencyOption[], option: CurrencyOption) => {
-    const last = array[array.length - 1]
-    return last === option
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -45,7 +41,7 @@ export const CurrencyPopover = ({
       <PopoverButton
         className={clsx(
           'absolute top-1/2 right-2 flex h-8 focus:outline-none',
-          '-translate-y-1 cursor-pointer items-end justify-center',
+          'cursor-pointer items-end justify-center',
           'rounded-lg px-3 py-2 text-2xl leading-5 hover:opacity-90',
           twText
         )}
@@ -70,56 +66,48 @@ export const CurrencyPopover = ({
           isSearch
         />
         <div className="mx-4 border-b-1 border-b-[#495077]" />
-        <div className='text-xs mr-auto px-4 text-gray-500 mt-2'>Популярные валюты</div>
+        <div className="mt-2 mr-auto px-4 text-xs text-gray-500">Популярные валюты</div>
         <div className="mt-2 flex flex-col">
           {displayedOptions.map((option) => (
-            <div>
+            <Fragment key={option.currency}>
               <PopoverButton
-                key={option.currency}
                 className={clsx(
-                  'w-full cursor-pointer bg-[#21284b] p-2 font-semibold hover:bg-[#29315c]',
-                  option.twText,
-                  isLastOption(displayedOptions, option) ? 'rounded-b-lg' : ''
+                  'w-full cursor-pointer p-2 font-semibold last-of-type:rounded-b-lg hover:bg-[#29315c]',
+                  option.twText
                 )}
                 onClick={() => {
                   setSelectedOption(option)
                 }}
               >
-                <div className="flex justify-between px-4">
+                <div className="flex items-center justify-between px-4">
                   <div className="flex items-center justify-center">
-                    <ReactSVG
-                      src={getPath(option.svg)}
-                      className="mr-1 h-[24px] w-[24px]"
-                    />
+                    <ReactSVG src={getPath(option.svg)} className="mr-1 h-[24px] w-[24px]" />
                     <div>{`${option.issuer || ''}(${option.blockchain})`}</div>
                   </div>
                   <div className="flex flex-col">
                     <div>{option.currency}</div>
-                    <div
-                      className={clsx(
-                        `ml-auto inline-block h-4 rounded-md pr-1 text-xs`,
-                        option.twBgIssuer,
-                        option.twTextIssuer
-                      )}
-                    >
-                      <div className="flex items-center justify-center">
-                        <ReactSVG
-                          src={getPath(option.svgNetwork)}
-                          className="h-[14px] w-[14px]"
-                        />
-                        <div>{option.network}</div>
+                    {option.network && (
+                      <div
+                        className={clsx(
+                          `ml-auto inline-block h-4 rounded-md pr-1 text-xs`,
+                          option.twBgIssuer,
+                          option.twTextIssuer
+                        )}
+                      >
+                        <div className="flex items-center justify-center">
+                          <ReactSVG
+                            src={getPath(option.svgNetwork)}
+                            className="h-[14px] w-[14px]"
+                          />
+                          <div>{option.network}</div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </PopoverButton>
-              <div
-                className={clsx(
-                  'mx-4 border-b-1 border-b-[#29315c]',
-                  isLastOption(displayedOptions, option) ? 'hidden' : ''
-                )}
-              />
-            </div>
+              <div className="mx-4 border-b-1 border-b-[#29315c] last-of-type:hidden" />
+            </Fragment>
           ))}
         </div>
       </PopoverPanel>
