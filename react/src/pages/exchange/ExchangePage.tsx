@@ -8,6 +8,7 @@ import { CurrencyPopover } from '../../components/CurrencyPopover'
 import { Input } from '../../components/Input'
 import { CURRENCY_OPTIONS } from '../../constants'
 import { getPath } from '../../utils/getPath'
+import { Button } from '../../components/Button'
 
 export const ExchangePage = () => {
   const [currencyFrom, setCurrencyFrom] = useState(CURRENCY_OPTIONS[0])
@@ -90,17 +91,20 @@ export const ExchangePage = () => {
           onChange={handleChange(setPurposePay)}
           placeholder="Введите назначение перевода"
         />
-        <div className="flex flex-col items-start">
-          <Checkbox
-            text="Согласен с политикой конфиденциальности"
-            textColor="text-gray-600"
-            color="accent-[#3e5ca7]"
-          />
-          <Checkbox
-            text="Согласен на обработку моих персональных данных"
-            textColor="text-gray-500"
-            color="accent-[#3e5ca7]"
-          />
+        <div className="flex justify-between">
+          <div className="flex flex-col items-start">
+            <Checkbox
+              text="Согласен с политикой конфиденциальности"
+              textColor="text-gray-400"
+              color="accent-[#3e5ca7]"
+            />
+            <Checkbox
+              text="Согласен на обработку моих персональных данных"
+              textColor="text-gray-300"
+              color="accent-[#3e5ca7]"
+            />
+          </div>
+          <Button>Начать обмен</Button>
         </div>
       </div>
     </div>

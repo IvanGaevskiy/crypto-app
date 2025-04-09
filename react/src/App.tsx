@@ -9,8 +9,19 @@ import { CompletedTransactionPage } from './pages/completed-transaction/Complete
 import { ExchangePage } from './pages/exchange/ExchangePage'
 
 createRoot(document.getElementById('root')!).render(
+  // <div className="flex min-h-[100dvh] w-full items-center justify-center">
+  //   <img className="absolute h-full w-full" src="./src/assets/space.svg"></img>
   <div className="flex min-h-[100dvh] w-full items-center justify-center">
-    <img className="absolute h-full w-full" src="./src/assets/body.svg"></img>
+    <div className="absolute top-0 z-0 h-[120%] w-full overflow-hidden ">
+      <img
+        className="absolute block h-auto w-full bottom-1/12 transform [-translate-x:50%] [translate-y:16%]"
+        src="./src/assets/space.svg"
+      ></img>
+      <img
+        className="absolute block h-auto w-full bottom-0 transform [-translate-x:50%] [translate-y:16%]"
+        src="./src/assets/planets.svg"
+      ></img>
+    </div>
     <div className="relative z-10">
       <BrowserRouter>
         <Routes>
