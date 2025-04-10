@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import clsx from 'clsx'
 import { ReactSVG } from 'react-svg'
 
+import { Button } from '../../components/Button'
 import { Checkbox } from '../../components/Checkbox'
 import { CurrencyPopover } from '../../components/CurrencyPopover'
 import { Input } from '../../components/Input'
 import { CURRENCY_OPTIONS } from '../../constants'
 import { getPath } from '../../utils/getPath'
-import { Button } from '../../components/Button'
+import { GET_СURRENCIES } from './ExchangeRequests'
+import type { ResponseGetCurrencies } from './ExchangeRequests'
 
 export const ExchangePage = () => {
   const [currencyFrom, setCurrencyFrom] = useState(CURRENCY_OPTIONS[0])
@@ -16,7 +18,7 @@ export const ExchangePage = () => {
   const [amountFrom, setAmountFrom] = useState<string>('')
   const [amountTo, setAmountTo] = useState<string>('')
   const [purposePay, setPurposePay] = useState<string>('')
-
+  const [pricesUSD, setPricesUSD] = useState<ResponseGetCurrencies>({})
   const { currency, twText, twBorder } = currencyFrom
   const { currency: currency2, twText: twText2, twBorder: twBorder2 } = currencyTo
 
@@ -31,7 +33,15 @@ export const ExchangePage = () => {
     setCurrencyFrom(currencyTo)
     setCurrencyTo(currencyFrom)
   }
-
+  
+  useEffect(() => {
+    const fetchPrices = () => GET_СURRENCIES().then(setPricesUSD);
+    fetchPrices()
+    const intervalID = setInterval(fetchPrices, 60000);
+    return () => clearInterval(intervalID);
+  }, []);
+  console.log(pricesUSD)
+  
   return (
     <div>
       {/* <h1>Exchange Page</h1>
