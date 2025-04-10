@@ -18,9 +18,9 @@ export const ExchangePage = () => {
   const [amountFrom, setAmountFrom] = useState<string>('')
   const [amountTo, setAmountTo] = useState<string>('')
   const [purposePay, setPurposePay] = useState<string>('')
-  const [pricesUSD, setPricesUSD] = useState<ResponseGetCurrencies>({})
-  const { currency, twText, twBorder } = currencyFrom
-  const { currency: currency2, twText: twText2, twBorder: twBorder2 } = currencyTo
+  const [currenciesAPI, setCurrenciesAPI] = useState<ResponseGetCurrencies>({})
+  const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
+  const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo  } = currencyTo
 
   const handleChange = (setFunc: (value: string) => void) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,12 +35,13 @@ export const ExchangePage = () => {
   }
   
   useEffect(() => {
-    const fetchPrices = () => GET_СURRENCIES().then(setPricesUSD);
+    const fetchPrices = () => GET_СURRENCIES().then(setCurrenciesAPI);
     fetchPrices()
     const intervalID = setInterval(fetchPrices, 60000);
     return () => clearInterval(intervalID);
   }, []);
-  console.log(pricesUSD)
+  
+  console.log(currenciesAPI['BTC'] ? currenciesAPI['BTC'].price_usd : '')
   
   return (
     <div>
@@ -48,51 +49,57 @@ export const ExchangePage = () => {
       <p>This is the exchange page.</p> */}
       <div className="flex flex-col gap-4">
         <div className="flex gap-4">
-          <div className="relative">
-            <label className={clsx('flex flex-col space-y-1', twText)}>
-              <div className="flex justify-between px-4 font-semibold">
-                <div>Отправляете</div>
-                <div>{currency}</div>
-              </div>
-              <Input
-                className={`h-14 w-80 !bg-[#000000b0] text-2xl ${twBorder} ${twText}`}
-                value={amountFrom}
-                onChange={handleChange(setAmountFrom)}
-              />
-              <CurrencyPopover
-                selectedOptionCurrency={currency}
-                setSelectedOption={setCurrencyFrom}
-              />
-            </label>
+          <div className="flex flex-col">
+            <div className="relative">
+              <label className={clsx('flex flex-col space-y-1', currColorFrom)}>
+                <div className="flex justify-between px-4 font-semibold">
+                  <div>Отправляете</div>
+                  <div>{currFrom}</div>
+                </div>
+                <Input
+                  className={`h-14 w-80 !bg-[#000000b0] text-2xl ${currBorderFrom} ${currColorFrom}`}
+                  value={amountFrom}
+                  onChange={handleChange(setAmountFrom)}
+                />
+                <CurrencyPopover
+                  selectedOptionCurrency={currFrom}
+                  setSelectedOption={setCurrencyFrom}
+                />
+              </label>
+            </div>
+            <div>{currenciesAPI['BTC'] ? currenciesAPI['BTC'].price_usd : ''}</div>
           </div>
-          <div className="mt-3 flex flex-col justify-center">
+          <div className="flex flex-col justify-center">
             <button className={clsx('cursor-pointer')} onClick={currencyReverse}>
               <ReactSVG
                 src={getPath('arrow_left.svg')}
-                className={clsx('mr-1 h-[16px] w-[16px]', twText2)}
+                className={clsx('mr-1 h-[16px] w-[16px]', currColorTo)}
               />
               <ReactSVG
                 src={getPath('arrow_right.svg')}
-                className={clsx('mr-1 h-[16px] w-[16px]', twText)}
+                className={clsx('mr-1 h-[16px] w-[16px]', currColorFrom)}
               />
             </button>
           </div>
-          <div className="relative">
-            <label className={clsx('flex flex-col space-y-1', twText2)}>
-              <div className="flex justify-between px-4 font-semibold">
-                <div>Получаете</div>
-                <div>{currency2}</div>
-              </div>
-              <Input
-                className={`h-14 w-80 !bg-[#000000b0] text-2xl ${twBorder2} ${twText2}`}
-                value={amountTo}
-                onChange={handleChange(setAmountTo)}
-              />
-              <CurrencyPopover
-                selectedOptionCurrency={currency2}
-                setSelectedOption={setCurrencyTo}
-              />
-            </label>
+          <div className="flex flex-col">
+            <div className="relative">
+              <label className={clsx('flex flex-col space-y-1', currColorTo)}>
+                <div className="flex justify-between px-4 font-semibold">
+                  <div>Получаете</div>
+                  <div>{currTo}</div>
+                </div>
+                <Input
+                  className={`h-14 w-80 !bg-[#000000b0] text-2xl ${currBorderTo} ${currColorTo}`}
+                  value={amountTo}
+                  onChange={handleChange(setAmountTo)}
+                />
+                <CurrencyPopover
+                  selectedOptionCurrency={currTo}
+                  setSelectedOption={setCurrencyTo}
+                />
+              </label>
+            </div>
+            <div>{currenciesAPI['USDT'] ? currenciesAPI['USDT'].price_usd : ''}</div>
           </div>
         </div>
         <Input
