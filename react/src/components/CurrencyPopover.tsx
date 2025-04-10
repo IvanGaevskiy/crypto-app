@@ -21,11 +21,8 @@ export const CurrencyPopover = ({
 }: CurrencyPopoverProps) => {
   const [inputValue, setInputValue] = useState<string>('')
 
-  const {
-    curr,
-    currColor,
-    currSvgPath
-  } = CURRENCY_OPTIONS.find((option) => option.curr === selectedOptionCurrency) || {}
+  const { curr, currColor, currSvgPath } =
+    CURRENCY_OPTIONS.find((option) => option.curr === selectedOptionCurrency) || {}
 
   const displayedOptions = CURRENCY_OPTIONS.filter((option) =>
     option.curr.toLowerCase().includes(inputValue.toLowerCase())
@@ -42,13 +39,21 @@ export const CurrencyPopover = ({
         className={clsx(
           'absolute top-1/2 right-2 flex h-8 focus:outline-none',
           'cursor-pointer items-end justify-center',
-          'rounded-lg px-3 py-2 text-2xl leading-5 hover:opacity-90',
+          'rounded-lg px-3 py-2 text-xl leading-5 hover:opacity-90',
           currColor
         )}
       >
         <div className="flex items-center justify-center">
           <ReactSVG src={getPath(currSvgPath)} className="mr-1 h-[24px] w-[24px]" />
-          <div>{curr}</div>
+          <div
+            className={clsx(
+              'after:ml-[.2em] after:inline-block after:translate-y-[28%]',
+              'after:border-[.27em_.208em] after:border-solid after:border-r-transparent',
+              'after:border-b-transparent after:border-l-transparent after:content-[""]'
+            )}
+          >
+            {curr}
+          </div>
         </div>
       </PopoverButton>
       <PopoverPanel
@@ -81,7 +86,10 @@ export const CurrencyPopover = ({
               >
                 <div className="flex items-center justify-between px-4">
                   <div className="flex items-center justify-center">
-                    <ReactSVG src={getPath(option.currSvgPath)} className="mr-1 h-[24px] w-[24px]" />
+                    <ReactSVG
+                      src={getPath(option.currSvgPath)}
+                      className="mr-1 h-[24px] w-[24px]"
+                    />
                     <div>{`${option.currIssuer || ''}(${option.currBlockchain})`}</div>
                   </div>
                   <div className="flex flex-col">
