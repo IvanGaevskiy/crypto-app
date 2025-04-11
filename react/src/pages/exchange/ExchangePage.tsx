@@ -144,10 +144,15 @@ export const ExchangePage = () => {
                 <div>{currFrom}</div>
               </div>
               <Input
-                className={`peer h-14 w-80 !bg-[#000000b0] text-2xl ${currBorderFrom} ${currColorFrom}`}
+                className={clsx(
+                  'peer h-14 w-80 !bg-[#000000b0] pr-32 text-2xl',
+                  currBorderFrom,
+                  currColorFrom
+                )}
                 value={amountFrom}
                 onChange={handleChange(setAmountFrom)}
                 maxLength={13}
+                type="number"
               />
 
               <CurrencyRateInfo
@@ -194,10 +199,15 @@ export const ExchangePage = () => {
                 <div>{currTo}</div>
               </div>
               <Input
-                className={`peer h-14 w-80 !bg-[#000000b0] text-2xl ${currBorderTo} ${currColorTo}`}
+                className={clsx(
+                  'peer h-14 w-80 !bg-[#000000b0] pr-32 text-2xl',
+                  currBorderTo,
+                  currColorTo
+                )}
                 value={amountTo}
                 readOnly
                 maxLength={13}
+                type="number"
               />
               <CurrencyRateInfo
                 currFrom={currTo}
@@ -226,18 +236,24 @@ export const ExchangePage = () => {
           </div>
         </div>
       </div>
-      <Input
-        className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
-        value={purposePay}
-        onChange={handleChange(setPurposePay)}
-        placeholder="Введите назначение перевода"
-      />
-      <Input
-        className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
-        value={email}
-        onChange={handleChange(setEmail)}
-        placeholder="Введите email"
-      />
+      <div>
+        <label className="block cursor-default pl-4 text-left text-gray-400">Назначение</label>
+        <Input
+          className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
+          value={purposePay}
+          onChange={handleChange(setPurposePay)}
+          placeholder="Введите назначение перевода"
+        />
+      </div>
+      <div>
+        <label className="block cursor-default pl-4 text-left text-gray-400">Email</label>
+        <Input
+          className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
+          value={email}
+          onChange={handleChange(setEmail)}
+          placeholder="Введите email"
+        />
+      </div>
       <div className="flex justify-between">
         <div className="flex flex-col items-start">
           <Checkbox
