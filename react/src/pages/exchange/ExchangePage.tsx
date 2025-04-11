@@ -205,7 +205,7 @@ export const ExchangePage = () => {
                   currColorTo
                 )}
                 value={amountTo}
-                readOnly
+                onChange={handleChange(setAmountTo)}
                 maxLength={13}
                 type="number"
               />
