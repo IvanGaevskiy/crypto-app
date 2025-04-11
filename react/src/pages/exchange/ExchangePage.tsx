@@ -130,7 +130,6 @@ export const ExchangePage = () => {
     if (isReversing || isAmountConvertFrom) return
     amountConvertTo()
     console.log('usfrom')
-
   }, [amountFrom])
 
   return (
@@ -150,14 +149,13 @@ export const ExchangePage = () => {
               />
 
               <CurrencyRateInfo
-                className={clsx('peer-focus:hidden')}
                 currFrom={currFrom}
                 currTo={currTo}
                 courseFrom={courseFrom}
                 currenciesAPI={currenciesAPI}
               />
 
-              <MinMaxContainer className={clsx('hidden peer-focus:flex')}>
+              <MinMaxContainer>
                 <MiniButton
                   className={currColorFrom}
                   text="min: "
@@ -179,7 +177,7 @@ export const ExchangePage = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-center">
+        <div className="mb-8 flex flex-col justify-center">
           <ReverseButton
             colorLeft={currColorTo}
             colorRight={currColorFrom}
@@ -199,14 +197,13 @@ export const ExchangePage = () => {
                 readOnly
               />
               <CurrencyRateInfo
-                className={clsx('peer-focus:hidden')}
                 currFrom={currTo}
                 currTo={currFrom}
                 courseFrom={courseTo}
                 currenciesAPI={currenciesAPI}
               />
 
-              <MinMaxContainer className={clsx('hidden peer-focus:flex')}>
+              <MinMaxContainer>
                 <MiniButton
                   className={currColorTo}
                   text="min: "
