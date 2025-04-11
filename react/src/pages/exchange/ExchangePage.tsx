@@ -35,6 +35,8 @@ export const ExchangePage = () => {
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
   const [isShowFee, setIsShowFee] = useState(true)
+  const [isKYC, setIsKYC] = useState(true)
+  const [isAML, setIsAML] = useState(true)
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
@@ -250,7 +252,7 @@ export const ExchangePage = () => {
         checked={isShowFee}
         onChange={onCheckboxChange(setIsShowFee)}
       />
-      <div>
+      <div className='mb-2'>
         <label className="block cursor-default pl-4 text-left text-gray-400">Назначение</label>
         <Input
           className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
@@ -259,7 +261,7 @@ export const ExchangePage = () => {
           placeholder="Введите назначение перевода"
         />
       </div>
-      <div>
+      <div className='mb-2'>
         <label className="block cursor-default pl-4 text-left text-gray-400">Email</label>
         <Input
           className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
@@ -269,16 +271,20 @@ export const ExchangePage = () => {
         />
       </div>
       <div className="flex justify-between">
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col items-start gap-1">
           <Checkbox
             text="Согласие с политикой конфиденциальности"
             className="accent-[#3e5ca7]"
             textClassName="text-gray-400 text-sm"
+            checked={isKYC}
+            onChange={onCheckboxChange(setIsKYC)}
           />
           <Checkbox
             text="Согласие на обработку персональных данных"
             className="accent-[#3e5ca7]"
             textClassName="text-gray-300 text-sm"
+            checked={isAML}
+            onChange={onCheckboxChange(setIsAML)}
           />
         </div>
         <Button>Начать обмен</Button>
