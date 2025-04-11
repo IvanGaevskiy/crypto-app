@@ -146,6 +146,7 @@ export const ExchangePage = () => {
                 className={`peer h-14 w-80 !bg-[#000000b0] text-2xl ${currBorderFrom} ${currColorFrom}`}
                 value={amountFrom}
                 onChange={handleChange(setAmountFrom)}
+                maxLength={13}
               />
 
               <CurrencyRateInfo
@@ -195,6 +196,7 @@ export const ExchangePage = () => {
                 className={`peer h-14 w-80 !bg-[#000000b0] text-2xl ${currBorderTo} ${currColorTo}`}
                 value={amountTo}
                 readOnly
+                maxLength={13}
               />
               <CurrencyRateInfo
                 currFrom={currTo}
