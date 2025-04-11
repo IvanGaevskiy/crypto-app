@@ -9,6 +9,7 @@ import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { CURRENCY_OPTIONS, CurrencyOption } from '../constants'
 import { getPath } from '../utils/getPath'
 import { Input } from './Input'
+import { SearchWrapper } from './SearchWrapper'
 
 type CurrencyPopoverProps = {
   selectedOptionCurrency: string
@@ -37,7 +38,7 @@ export const CurrencyPopover = ({
     <Popover>
       <PopoverButton
         className={clsx(
-          'absolute top-1/2 right-2 flex h-8 focus:outline-none',
+          'absolute top-11 right-2 flex h-8 focus:outline-none',
           'cursor-pointer items-end justify-center',
           'rounded-lg px-3 py-2 text-xl leading-5 hover:opacity-90',
           currColor
@@ -63,13 +64,14 @@ export const CurrencyPopover = ({
           currColor
         )}
       >
-        <Input
-          placeholder="Введите название или тикер"
-          className="h-14 w-80 border-[#21284b]"
-          value={inputValue}
-          onChange={handleChange}
-          isSearch
-        />
+        <SearchWrapper>
+          <Input
+            placeholder="Введите название или тикер"
+            className="h-14 w-80 border-[#21284b] pl-10"
+            value={inputValue}
+            onChange={handleChange}
+          />
+        </SearchWrapper>
         <div className="mx-4 border-b-1 border-b-[#495077]" />
         <div className="mt-2 mr-auto px-4 text-xs text-gray-500">Популярные валюты</div>
         <div className="mt-2 flex flex-col">
