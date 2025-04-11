@@ -14,6 +14,7 @@ export const Checkbox = ({ className, text, textClassName, color, ...rest }: Inp
       <label className={clsx('inline-flex items-center')} htmlFor="redCheckBox">
         <input
           type="checkbox"
+          checked
           className={clsx('h-4.5 w-4.5 rounded-lg', className)}
           {...rest}
         />

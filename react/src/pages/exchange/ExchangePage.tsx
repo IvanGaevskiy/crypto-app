@@ -234,12 +234,12 @@ export const ExchangePage = () => {
       <div className="flex justify-between">
         <div className="flex flex-col items-start">
           <Checkbox
-            text="Согласен с политикой конфиденциальности"
+            text="Согласие с политикой конфиденциальности"
             className="accent-[#3e5ca7]"
             textClassName="text-gray-400 text-sm"
           />
           <Checkbox
-            text="Согласен на обработку моих персональных данных"
+            text="Согласие на обработку персональных данных"
             className="accent-[#3e5ca7]"
             textClassName="text-gray-300 text-sm"
           />
