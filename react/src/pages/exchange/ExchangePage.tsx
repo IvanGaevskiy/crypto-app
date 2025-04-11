@@ -12,6 +12,8 @@ import { MiniButton } from '../../components/MiniButton'
 import { ReverseButton } from '../../components/ReverseButton'
 import { CURRENCY_OPTIONS } from '../../constants'
 import { numCut } from '../../utils/numCut'
+import { onCheckboxChange } from '../../utils/onCheckboxChange'
+import { onInputChange } from '../../utils/onInputChange'
 import { getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
 
@@ -32,16 +34,10 @@ export const ExchangePage = () => {
   const [isReversing, setIsReversing] = useState(false)
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
+  const [isShowFee, setIsShowFee] = useState(true)
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
-
-  const handleChange = (setFunc: (value: string) => void) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      setFunc(value)
-    }
-  }
 
   const currencyReverse = () => {
     setIsReversing(true)
@@ -93,19 +89,30 @@ export const ExchangePage = () => {
     }
   }
 
-  const valCalc = (amount: string, rate: number) => {
-    return String(numCut(Number(amount) * rate))
+  const amountCalc = (amount: string, rate: number, currType: string) => {
+    const value = Number(amount) * rate
+
+    if (!isShowFee) {
+      return String(numCut(value))
+    }
+
+    const exhangerFee = value * 0.03
+    const mainersFee = currType === 'BTC' ? 0.000006 : rate * 0.000006
+    const totalFee = exhangerFee + mainersFee
+    
+    const finalValue = value - totalFee
+    return String(numCut(finalValue))
   }
 
   const amountConvertFrom = () => {
     setIsAmountConvertFrom(true)
-    setAmountFrom(valCalc(amountTo, courseTo))
+    setAmountFrom(amountCalc(amountTo, courseTo, currTo))
     setTimeout(() => setIsAmountConvertFrom(false), 0)
   }
 
   const amountConvertTo = () => {
     setIsAmountConvertTo(true)
-    setAmountTo(valCalc(amountFrom, courseFrom))
+    setAmountTo(amountCalc(amountFrom, courseFrom, currTo))
     setTimeout(() => setIsAmountConvertTo(false), 0)
   }
 
@@ -119,7 +126,7 @@ export const ExchangePage = () => {
 
   useEffect(() => {
     courseCalc(currenciesAPI)
-  }, [currencyFrom, currencyTo, currencyFrom, currencyTo])
+  }, [currenciesAPI, currencyFrom, currencyTo])
 
   useEffect(() => {
     if (isReversing || isAmountConvertTo) return
@@ -131,10 +138,10 @@ export const ExchangePage = () => {
     if (isReversing || isAmountConvertFrom) return
     amountConvertTo()
     console.log('usfrom')
-  }, [amountFrom])
+  }, [amountFrom, isShowFee])
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col">
       <div className="flex gap-4">
         <div className="flex flex-col">
           <div className="relative">
@@ -150,7 +157,7 @@ export const ExchangePage = () => {
                   currColorFrom
                 )}
                 value={amountFrom}
-                onChange={handleChange(setAmountFrom)}
+                onChange={onInputChange(setAmountFrom)}
                 maxLength={13}
                 type="number"
               />
@@ -205,7 +212,7 @@ export const ExchangePage = () => {
                   currColorTo
                 )}
                 value={amountTo}
-                onChange={handleChange(setAmountTo)}
+                onChange={onInputChange(setAmountTo)}
                 maxLength={13}
                 type="number"
               />
@@ -236,12 +243,19 @@ export const ExchangePage = () => {
           </div>
         </div>
       </div>
+      <Checkbox
+        text="Показать с учётом комиссии"
+        className="ml-auto accent-[#3e5ca7]"
+        textClassName="text-gray-300 text-sm"
+        checked={isShowFee}
+        onChange={onCheckboxChange(setIsShowFee)}
+      />
       <div>
         <label className="block cursor-default pl-4 text-left text-gray-400">Назначение</label>
         <Input
           className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
           value={purposePay}
-          onChange={handleChange(setPurposePay)}
+          onChange={onInputChange(setPurposePay)}
           placeholder="Введите назначение перевода"
         />
       </div>
@@ -250,7 +264,7 @@ export const ExchangePage = () => {
         <Input
           className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
           value={email}
-          onChange={handleChange(setEmail)}
+          onChange={onInputChange(setEmail)}
           placeholder="Введите email"
         />
       </div>

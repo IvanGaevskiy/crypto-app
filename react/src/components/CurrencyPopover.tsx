@@ -29,7 +29,7 @@ export const CurrencyPopover = ({
     option.curr.toLowerCase().includes(inputValue.toLowerCase())
   )
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setInputValue(value)
   }
@@ -69,7 +69,7 @@ export const CurrencyPopover = ({
             placeholder="Введите название или тикер"
             className="h-14 w-80 border-[#21284b] pl-10"
             value={inputValue}
-            onChange={handleChange}
+            onChange={onInputChange}
           />
         </SearchWrapper>
         <div className="mx-4 border-b-1 border-b-[#495077]" />
