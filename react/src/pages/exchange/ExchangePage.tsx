@@ -68,7 +68,7 @@ export const ExchangePage = () => {
     return () => {
       clearInterval(intervalID)
     }
-  }, [])
+  }, [currencyFrom, currencyTo])
 
   return (
     <div>
