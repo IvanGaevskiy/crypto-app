@@ -21,6 +21,7 @@ export const ExchangePage = () => {
   const [amountFrom, setAmountFrom] = useState('')
   const [amountTo, setAmountTo] = useState('')
   const [purposePay, setPurposePay] = useState('')
+  const [email, setEmail] = useState('')
   const [currenciesAPI, setCurrenciesAPI] = useState<ResponseGetCurrencies>({})
   const [courseFrom, setCourseFrom] = useState(0)
   const [courseTo, setCourseTo] = useState(0)
@@ -230,6 +231,12 @@ export const ExchangePage = () => {
         value={purposePay}
         onChange={handleChange(setPurposePay)}
         placeholder="Введите назначение перевода"
+      />
+      <Input
+        className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
+        value={email}
+        onChange={handleChange(setEmail)}
+        placeholder="Введите email"
       />
       <div className="flex justify-between">
         <div className="flex flex-col items-start">
