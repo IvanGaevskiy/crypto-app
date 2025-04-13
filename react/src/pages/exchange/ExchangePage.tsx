@@ -49,18 +49,15 @@ export const ExchangePage = () => {
     setIsReversing(true)
     setCurrencyFrom(currencyTo)
     setCurrencyTo(currencyFrom)
-    setAmountFrom(amountTo)
-    setAmountTo(amountFrom)
-
     setTimeout(() => {
       setIsReversing(false)
     }, 0)
   }
 
-  const courseCalc = (currenciesAPI: ResponseGetCurrencies) => {
-    if (currenciesAPI?.[currFrom] && currenciesAPI?.[currTo]) {
-      const from = new Decimal(currenciesAPI[currFrom].price_usd)
-      const to = new Decimal(currenciesAPI[currTo].price_usd)
+  const courseCalc = (dataCurrAPI: ResponseGetCurrencies) => {
+    if (dataCurrAPI?.[currFrom] && dataCurrAPI?.[currTo]) {
+      const from = new Decimal(dataCurrAPI[currFrom].price_usd)
+      const to = new Decimal(dataCurrAPI[currTo].price_usd)
 
       const resultCourseFrom = numCut(new Decimal(from).div(to).abs())
       const resultCourseTo = numCut(new Decimal(to).div(from).abs())
@@ -68,7 +65,7 @@ export const ExchangePage = () => {
       setCourseFrom(resultCourseFrom.toString())
       setCourseTo(resultCourseTo.toString())
 
-      const priceUSDT = new Decimal(currenciesAPI['USDT'].price_usd)
+      const priceUSDT = new Decimal(dataCurrAPI['USDT'].price_usd)
       const min = priceUSDT.times('11')
       const max = priceUSDT.times('30')
 
@@ -96,8 +93,6 @@ export const ExchangePage = () => {
   }
 
   const amountCalc = (amount: string, rate: string, currType: string) => {
-    console.log("amount", amount)
-    console.log("rate", rate)
     const value = new Decimal(amount).times(rate)
 
     const exhangerFee = value.times(0.03)
@@ -142,7 +137,7 @@ export const ExchangePage = () => {
 
   useEffect(() => {
     if (isReversing) {
-      amountCalc(amountFrom, courseFrom, currTo)
+      setAmountTo(amountCalc(amountFrom, courseFrom, currTo))
     }
   }, [courseTo, courseFrom])
 
