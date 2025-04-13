@@ -4,7 +4,7 @@ import clsx from 'clsx'
 type Props = {
   currFrom: string
   currTo: string
-  courseFrom: number
+  courseFrom: string
   currenciesAPI: Record<string, { price_usd: string }>
   className?: string
 }

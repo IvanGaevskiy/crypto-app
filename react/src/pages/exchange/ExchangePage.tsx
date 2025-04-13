@@ -17,22 +17,24 @@ import { onInputChange } from '../../utils/onInputChange'
 import { getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
 
+import { Decimal } from 'decimal.js'
+
 export const ExchangePage = () => {
   const [currencyFrom, setCurrencyFrom] = useState(CURRENCY_OPTIONS[0])
   const [currencyTo, setCurrencyTo] = useState(CURRENCY_OPTIONS[1])
-  const [amountFrom, setAmountFrom] = useState('')
-  const [amountTo, setAmountTo] = useState('')
+  const [amountFrom, setAmountFrom] = useState('0')
+  const [amountTo, setAmountTo] = useState('0')
   const [purposePay, setPurposePay] = useState('')
   const [email, setEmail] = useState('')
   const [currenciesAPI, setCurrenciesAPI] = useState<ResponseGetCurrencies>({})
-  const [courseFrom, setCourseFrom] = useState(0)
-  const [courseTo, setCourseTo] = useState(0)
-  const [maxFrom, setMaxFrom] = useState(0)
-  const [maxTo, setMaxTo] = useState(0)
-  const [minFrom, setMinFrom] = useState(0)
-  const [minTo, setMinTo] = useState(0)
-  const [exhangerFee, setExhangerFee] = useState(0)
-  const [mainersFee, setMainersFee] = useState(0)
+  const [courseFrom, setCourseFrom] = useState('0')
+  const [courseTo, setCourseTo] = useState('0')
+  const [maxFrom, setMaxFrom] = useState('0')
+  const [maxTo, setMaxTo] = useState('0')
+  const [minFrom, setMinFrom] = useState('0')
+  const [minTo, setMinTo] = useState('0')
+  const [exhangerFee, setExhangerFee] = useState('0')
+  const [mainersFee, setMainersFee] = useState('0')
   const [isReversing, setIsReversing] = useState(false)
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
@@ -57,29 +59,29 @@ export const ExchangePage = () => {
 
   const courseCalc = (currenciesAPI: ResponseGetCurrencies) => {
     if (currenciesAPI?.[currFrom] && currenciesAPI?.[currTo]) {
-      const from = Number(currenciesAPI[currFrom].price_usd)
-      const to = Number(currenciesAPI[currTo].price_usd)
+      const from = new Decimal(currenciesAPI[currFrom].price_usd)
+      const to = new Decimal(currenciesAPI[currTo].price_usd)
 
-      const resultCourseFrom = numCut(Math.abs(from / to))
-      const resultCourseTo = numCut(Math.abs(to / from))
+      const resultCourseFrom = numCut(new Decimal(from).div(to).abs())
+      const resultCourseTo = numCut(new Decimal(to).div(from).abs())
 
-      setCourseFrom(resultCourseFrom)
-      setCourseTo(resultCourseTo)
+      setCourseFrom(resultCourseFrom.toString())
+      setCourseTo(resultCourseTo.toString())
 
-      const priceUSDT = Number(currenciesAPI['USDT'].price_usd)
-      const min = priceUSDT * 11
-      const max = priceUSDT * 30
+      const priceUSDT = new Decimal(currenciesAPI['USDT'].price_usd)
+      const min = priceUSDT.times('11')
+      const max = priceUSDT.times('30')
 
-      const resultMaxFrom = numCut(Math.abs(max / from))
-      const resultMaxTo = numCut(Math.abs(max / to))
-      const resultMinFrom = numCut(Math.abs(min / from))
-      const resultMinTo = numCut(Math.abs(min / to))
+      const resultMaxFrom = numCut(max.div(from).abs())
+      const resultMaxTo = numCut(max.div(to).abs())
+      const resultMinFrom = numCut(min.div(from).abs())
+      const resultMinTo = numCut(min.div(to).abs())
 
-      setMaxFrom(resultMaxFrom)
-      setMaxTo(resultMaxTo)
+      setMaxFrom(resultMaxFrom.toString())
+      setMaxTo(resultMaxTo.toString())
 
-      setMinFrom(resultMinFrom)
-      setMinTo(resultMinTo)
+      setMinFrom(resultMinFrom.toString())
+      setMinTo(resultMinTo.toString())
     }
   }
 
@@ -93,19 +95,21 @@ export const ExchangePage = () => {
     }
   }
 
-  const amountCalc = (amount: string, rate: number, currType: string) => {
-    const value = Number(amount) * rate
+  const amountCalc = (amount: string, rate: string, currType: string) => {
+    console.log("amount", amount)
+    console.log("rate", rate)
+    const value = new Decimal(amount).times(rate)
 
-    const exhangerFee = value * 0.03
-    const ifNotBTC = value <= 0 ? 0 : rate * 0.000006
-    const mainersFee = currType === 'BTC' ? 0.000006 : ifNotBTC
+    const exhangerFee = value.times(0.03)
+    const ifNotBTC = value.lte('0') ? new Decimal('0') : new Decimal(rate).times('0.000006')
+    const mainersFee = currType === 'BTC' ? new Decimal('0.000006') : ifNotBTC
 
-    setExhangerFee(numCut(exhangerFee))
-    setMainersFee(numCut(mainersFee))
+    setExhangerFee(numCut(exhangerFee).toString())
+    setMainersFee(numCut(mainersFee).toString())
 
     if (isShowFee && amount === amountFrom) {
-      const totalFee = exhangerFee + mainersFee
-      const finalValue = value - totalFee
+      const totalFee = exhangerFee.plus(mainersFee)
+      const finalValue = value.minus(totalFee)
       return String(numCut(finalValue))
     }
 
@@ -262,13 +266,9 @@ export const ExchangePage = () => {
         )}
       >
         <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none')}>
-          <div>
-            <span>Комиссия обменника:</span>
-            <span className={clsx(currColorTo)}>{exhangerFee}</span>
+          <div>{`Комиссия обменника ${exhangerFee} ${currTo}`}
           </div>
-          <div>
-            <span>Комиссия майнеров:</span>
-            <span className={clsx(currColorTo)}>{mainersFee}</span>
+          <div>{`Комиссия майнеров ${mainersFee} ${currTo}`}
           </div>
         </div>
         <Checkbox
