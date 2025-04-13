@@ -54,32 +54,42 @@ export const ExchangePage = () => {
     }, 0)
   }
 
-  const courseCalc = (dataCurrAPI: ResponseGetCurrencies) => {
-    if (dataCurrAPI?.[currFrom] && dataCurrAPI?.[currTo]) {
-      const from = new Decimal(dataCurrAPI[currFrom].price_usd)
-      const to = new Decimal(dataCurrAPI[currTo].price_usd)
-
-      const resultCourseFrom = numCut(new Decimal(from).div(to).abs())
-      const resultCourseTo = numCut(new Decimal(to).div(from).abs())
-
-      setCourseFrom(resultCourseFrom.toString())
-      setCourseTo(resultCourseTo.toString())
-
-      const priceUSDT = new Decimal(dataCurrAPI['USDT'].price_usd)
-      const min = priceUSDT.times('11')
-      const max = priceUSDT.times('30')
-
-      const resultMaxFrom = numCut(max.div(from).abs())
-      const resultMaxTo = numCut(max.div(to).abs())
-      const resultMinFrom = numCut(min.div(from).abs())
-      const resultMinTo = numCut(min.div(to).abs())
-
-      setMaxFrom(resultMaxFrom.toString())
-      setMaxTo(resultMaxTo.toString())
-
-      setMinFrom(resultMinFrom.toString())
-      setMinTo(resultMinTo.toString())
+  const getPriceUSD = (curr: string, dataCurrAPI: ResponseGetCurrencies) => {
+    if (dataCurrAPI?.[curr]) {
+      return new Decimal(dataCurrAPI[curr].price_usd)
     }
+    return new Decimal('0')
+  }
+
+  const courseCalc = (dataCurrAPI: ResponseGetCurrencies) => {
+    const from = getPriceUSD(currFrom, dataCurrAPI)
+    const to = getPriceUSD(currTo, dataCurrAPI)
+
+    const resultCourseFrom = numCut(new Decimal(from).div(to).abs())
+    const resultCourseTo = numCut(new Decimal(to).div(from).abs())
+
+    setCourseFrom(resultCourseFrom.toString())
+    setCourseTo(resultCourseTo.toString())
+  }
+
+  const maxMinCalc = (dataCurrAPI: ResponseGetCurrencies) => {
+    const from = getPriceUSD(currFrom, dataCurrAPI)
+    const to = getPriceUSD(currTo, dataCurrAPI)
+
+    const priceUSDT = getPriceUSD('USDT', dataCurrAPI)
+    const min = priceUSDT.times('11')
+    const max = priceUSDT.times('30')
+
+    const resultMaxFrom = numCut(max.div(from).abs())
+    const resultMaxTo = numCut(max.div(to).abs())
+    const resultMinFrom = numCut(min.div(from).abs())
+    const resultMinTo = numCut(min.div(to).abs())
+
+    setMaxFrom(resultMaxFrom.toString())
+    setMaxTo(resultMaxTo.toString())
+
+    setMinFrom(resultMinFrom.toString())
+    setMinTo(resultMinTo.toString())
   }
 
   const fetchPrices = async () => {
@@ -87,6 +97,7 @@ export const ExchangePage = () => {
       const data = await getCurrencies()
       setCurrenciesAPI(data)
       courseCalc(data)
+      maxMinCalc(data)
     } catch (error) {
       console.log(error)
     }
@@ -133,6 +144,7 @@ export const ExchangePage = () => {
 
   useEffect(() => {
     courseCalc(currenciesAPI)
+    maxMinCalc(currenciesAPI)
   }, [currenciesAPI, currencyFrom, currencyTo])
 
   useEffect(() => {
@@ -261,10 +273,8 @@ export const ExchangePage = () => {
         )}
       >
         <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none')}>
-          <div>{`Комиссия обменника ${exhangerFee} ${currTo}`}
-          </div>
-          <div>{`Комиссия майнеров ${mainersFee} ${currTo}`}
-          </div>
+          <div>{`Комиссия обменника ${exhangerFee} ${currTo}`}</div>
+          <div>{`Комиссия майнеров ${mainersFee} ${currTo}`}</div>
         </div>
         <Checkbox
           text="Показать с учётом комиссии"
