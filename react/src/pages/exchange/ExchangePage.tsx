@@ -10,7 +10,7 @@ import { Input } from '../../components/Input'
 import { MinMaxContainer } from '../../components/MinMaxContainer'
 import { MiniButton } from '../../components/MiniButton'
 import { ReverseButton } from '../../components/ReverseButton'
-import { CURRENCY_OPTIONS } from '../../constants'
+import { CURRENCY_OPTIONS, EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
 import { numCut } from '../../utils/numCut'
 import { onCheckboxChange } from '../../utils/onCheckboxChange'
 import { onInputChange } from '../../utils/onInputChange'
@@ -61,7 +61,7 @@ export const ExchangePage = () => {
     return new Decimal('0')
   }
 
-  const courseCalc = (dataCurrAPI: ResponseGetCurrencies) => {
+  const setCourses = (dataCurrAPI: ResponseGetCurrencies) => {
     const from = getPriceUSD(currFrom, dataCurrAPI)
     const to = getPriceUSD(currTo, dataCurrAPI)
 
@@ -72,13 +72,21 @@ export const ExchangePage = () => {
     setCourseTo(resultCourseTo.toString())
   }
 
-  const maxMinCalc = (dataCurrAPI: ResponseGetCurrencies) => {
+  const limitAfterFees = (priceBTC: Decimal, limit: string) => {
+    const exchangeFee = new Decimal(limit).times(EX_FEE)
+    const mainersFee = priceBTC.times(TX_FEE)
+    const totalFees = exchangeFee.plus(mainersFee)
+    return new Decimal(limit).minus(totalFees)
+  }
+
+  const setMaxMin = (dataCurrAPI: ResponseGetCurrencies) => {
     const from = getPriceUSD(currFrom, dataCurrAPI)
     const to = getPriceUSD(currTo, dataCurrAPI)
 
-    const priceUSDT = getPriceUSD('USDT', dataCurrAPI)
-    const min = priceUSDT.times('11')
-    const max = priceUSDT.times('30')
+    const priceBTC = getPriceUSD('BTC', dataCurrAPI)
+
+    const min = limitAfterFees(priceBTC, MIN)
+    const max = limitAfterFees(priceBTC, MAX)
 
     const resultMaxFrom = numCut(max.div(from).abs())
     const resultMaxTo = numCut(max.div(to).abs())
@@ -96,22 +104,35 @@ export const ExchangePage = () => {
     try {
       const data = await getCurrencies()
       setCurrenciesAPI(data)
-      courseCalc(data)
-      maxMinCalc(data)
+      setCourses(data)
+      setMaxMin(data)
     } catch (error) {
       console.log(error)
     }
   }
 
-  const amountCalc = (amount: string, rate: string, currType: string) => {
+  const getExFee = (amount: string) => {
+    const value = new Decimal(amount).times(EX_FEE)
+    return value
+  }
+  
+  const getTxFee = (amount: string, rate: string) => {
+    const ifBTC = currTo === 'BTC' ? new Decimal(TX_FEE) : new Decimal(rate).times(TX_FEE)
+    const isNotAmount = new Decimal(amount).lte('0')
+    return isNotAmount ? new Decimal('0') : ifBTC
+  }
+
+  const setFees = (exFee: Decimal, txFee: Decimal) => {
+    setExhangerFee(numCut(exFee).toString())
+    setMainersFee(numCut(txFee).toString())
+  }
+
+  const amountCalc = (amount: string, rate: string) => {
     const value = new Decimal(amount).times(rate)
-
-    const exhangerFee = value.times(0.03)
-    const ifNotBTC = value.lte('0') ? new Decimal('0') : new Decimal(rate).times('0.000006')
-    const mainersFee = currType === 'BTC' ? new Decimal('0.000006') : ifNotBTC
-
-    setExhangerFee(numCut(exhangerFee).toString())
-    setMainersFee(numCut(mainersFee).toString())
+    const exhangerFee = value.times(EX_FEE)
+    const mainersFee = getTxFee(amount, rate)
+    
+    setFees(exhangerFee, mainersFee)
 
     if (isShowFee && amount === amountFrom) {
       const totalFee = exhangerFee.plus(mainersFee)
@@ -124,13 +145,28 @@ export const ExchangePage = () => {
 
   const amountConvertFrom = () => {
     setIsAmountConvertFrom(true)
-    setAmountFrom(amountCalc(amountTo, courseTo, currTo))
+
+    const value = new Decimal(amountTo)
+    const exhangerFee = getExFee(amountTo)
+    const mainersFee = getTxFee(amountTo, courseFrom)
+    
+    setFees(exhangerFee, mainersFee)
+
+    if (isShowFee) {
+      const totalFee = exhangerFee.plus(mainersFee)
+      const valAfterFeets = value.minus(totalFee)
+      const finalValue = valAfterFeets.times(courseTo)
+      setAmountFrom(String(numCut(finalValue)))
+    } else {
+      setAmountFrom(String(numCut(value.times(courseTo))))
+    }
+
     setTimeout(() => setIsAmountConvertFrom(false), 0)
   }
 
   const amountConvertTo = () => {
     setIsAmountConvertTo(true)
-    setAmountTo(amountCalc(amountFrom, courseFrom, currTo))
+    setAmountTo(amountCalc(amountFrom, courseFrom))
     setTimeout(() => setIsAmountConvertTo(false), 0)
   }
 
@@ -143,14 +179,13 @@ export const ExchangePage = () => {
   }, [])
 
   useEffect(() => {
-    courseCalc(currenciesAPI)
-    maxMinCalc(currenciesAPI)
+    setCourses(currenciesAPI)
+    setMaxMin(currenciesAPI)
   }, [currenciesAPI, currencyFrom, currencyTo])
 
   useEffect(() => {
-    if (isReversing) {
-      setAmountTo(amountCalc(amountFrom, courseFrom, currTo))
-    }
+    if (!isReversing) return
+    setAmountTo(amountCalc(amountFrom, courseFrom))
   }, [courseTo, courseFrom])
 
   useEffect(() => {

@@ -35,3 +35,8 @@ export const CURRENCY_OPTIONS: CurrencyOption[] = [
     currFocusBorder: 'focus:border-[#26a17b]'
   }
 ]
+
+export const EX_FEE = '0.03'
+export const TX_FEE = '0.000006'
+export const MIN = '11'
+export const MAX = '30'

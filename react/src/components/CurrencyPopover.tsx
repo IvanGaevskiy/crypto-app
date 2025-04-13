@@ -6,10 +6,10 @@ import { ReactSVG } from 'react-svg'
 
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
-import { CURRENCY_OPTIONS, CurrencyOption } from '../constants'
 import { getPath } from '../utils/getPath'
 import { Input } from './Input'
 import { SearchWrapper } from './SearchWrapper'
+import { CURRENCY_OPTIONS, CurrencyOption } from '../constanst'
 
 type CurrencyPopoverProps = {
   selectedOptionCurrency: string
