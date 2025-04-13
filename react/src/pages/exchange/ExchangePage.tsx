@@ -31,6 +31,8 @@ export const ExchangePage = () => {
   const [maxTo, setMaxTo] = useState(0)
   const [minFrom, setMinFrom] = useState(0)
   const [minTo, setMinTo] = useState(0)
+  const [exhangerFee, setExhangerFee] = useState(0)
+  const [mainersFee, setMainersFee] = useState(0)
   const [isReversing, setIsReversing] = useState(false)
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
@@ -94,16 +96,20 @@ export const ExchangePage = () => {
   const amountCalc = (amount: string, rate: number, currType: string) => {
     const value = Number(amount) * rate
 
-    if (!isShowFee) {
-      return String(numCut(value))
+    const exhangerFee = value * 0.03
+    const ifNotBTC = value <= 0 ? 0 : rate * 0.000006
+    const mainersFee = currType === 'BTC' ? 0.000006 : ifNotBTC
+
+    setExhangerFee(numCut(exhangerFee))
+    setMainersFee(numCut(mainersFee))
+
+    if (isShowFee && amount === amountFrom) {
+      const totalFee = exhangerFee + mainersFee
+      const finalValue = value - totalFee
+      return String(numCut(finalValue))
     }
 
-    const exhangerFee = value * 0.03
-    const mainersFee = currType === 'BTC' ? 0.000006 : rate * 0.000006
-    const totalFee = exhangerFee + mainersFee
-    
-    const finalValue = value - totalFee
-    return String(numCut(finalValue))
+    return String(numCut(value))
   }
 
   const amountConvertFrom = () => {
@@ -131,15 +137,19 @@ export const ExchangePage = () => {
   }, [currenciesAPI, currencyFrom, currencyTo])
 
   useEffect(() => {
+    if (isReversing) {
+      amountCalc(amountFrom, courseFrom, currTo)
+    }
+  }, [courseTo, courseFrom])
+
+  useEffect(() => {
     if (isReversing || isAmountConvertTo) return
-    console.log('usto')
     amountConvertFrom()
   }, [amountTo])
 
   useEffect(() => {
     if (isReversing || isAmountConvertFrom) return
     amountConvertTo()
-    console.log('usfrom')
   }, [amountFrom, isShowFee])
 
   return (
@@ -245,14 +255,31 @@ export const ExchangePage = () => {
           </div>
         </div>
       </div>
-      <Checkbox
-        text="Показать с учётом комиссии"
-        className="ml-auto accent-[#3e5ca7]"
-        textClassName="text-gray-300 text-sm"
-        checked={isShowFee}
-        onChange={onCheckboxChange(setIsShowFee)}
-      />
-      <div className='mb-2'>
+      <div
+        className={clsx(
+          'mb-2 flex justify-between border border-dashed border-gray-400',
+          'gap-4 rounded-md !bg-[#1e235f] p-2 px-4'
+        )}
+      >
+        <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none')}>
+          <div>
+            <span>Комиссия обменника:</span>
+            <span className={clsx(currColorTo)}>{exhangerFee}</span>
+          </div>
+          <div>
+            <span>Комиссия майнеров:</span>
+            <span className={clsx(currColorTo)}>{mainersFee}</span>
+          </div>
+        </div>
+        <Checkbox
+          text="Показать с учётом комиссии"
+          className="ml-auto accent-[#3e5ca7]"
+          textClassName="text-gray-300 text-xs"
+          checked={isShowFee}
+          onChange={onCheckboxChange(setIsShowFee)}
+        />
+      </div>
+      <div className="mb-2">
         <label className="block cursor-default pl-4 text-left text-gray-400">Назначение</label>
         <Input
           className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
@@ -261,7 +288,7 @@ export const ExchangePage = () => {
           placeholder="Введите назначение перевода"
         />
       </div>
-      <div className='mb-2'>
+      <div className="mb-2">
         <label className="block cursor-default pl-4 text-left text-gray-400">Email</label>
         <Input
           className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
