@@ -186,15 +186,7 @@ export const ExchangePage = () => {
     const mainersFee = getTxFee(amountTo, courseFrom)
 
     setFees(exhangerFee, mainersFee)
-
-    if (isShowFee) {
-      const totalFee = exhangerFee.plus(mainersFee)
-      const valAfterFeets = value.minus(totalFee)
-      const finalValue = valAfterFeets.times(courseTo)
-      setAmountFrom(String(numCut(finalValue)))
-    } else {
-      setAmountFrom(String(numCut(value.times(courseTo))))
-    }
+    setAmountFrom(String(numCut(value.times(courseTo))))
 
     setTimeout(() => setIsAmountConvertFrom(false), 0)
   }
