@@ -54,29 +54,66 @@ export const ExchangePage = () => {
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
 
+  // const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   e.preventDefault()
+  //   console.log('Начинаем валидацию...')
+
+  //   console.log('amountFrom:', isValidAmountFrom(amountFrom, minFrom, maxFrom))
+  //   console.log('amountTo:', isValidAmountTo(amountTo, minTo, maxTo))
+  //   console.log('purposePay:', isValidPurposePay(purposePay))
+  //   console.log('email:', isValidEmail(email))
+  //   console.log('KYC & AML:', isValidKYCAndAML([isKYC, isAML]))
+
+  //   if (
+  //     !isValidAmountFrom(amountFrom, minFrom, maxFrom) &&
+  //     !isValidAmountTo(amountTo, minTo, maxTo) &&
+  //     !isValidPurposePay(purposePay) &&
+  //     !isValidEmail(email) &&
+  //     !isValidKYCAndAML([isKYC, isAML])
+  //   ) {
+  //     console.log('Все валидации пройдены успешно!')
+  //     push('/completed_transaction')
+  //   } else {
+  //     console.log('Некоторые валидации не пройдены :(')
+  //   }
+  // }
+
   const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     console.log('Начинаем валидацию...')
-
-    console.log('amountFrom:', isValidAmountFrom(amountFrom, minFrom, maxFrom))
-    console.log('amountTo:', isValidAmountTo(amountTo, minTo, maxTo))
-    console.log('purposePay:', isValidPurposePay(purposePay))
-    console.log('email:', isValidEmail(email))
-    console.log('KYC & AML:', isValidKYCAndAML([isKYC, isAML]))
-
-    if (
-      !isValidAmountFrom(amountFrom, minFrom, maxFrom) &&
-      !isValidAmountTo(amountTo, minTo, maxTo) &&
-      !isValidPurposePay(purposePay) &&
-      !isValidEmail(email) &&
-      !isValidKYCAndAML([isKYC, isAML])
-    ) {
+  
+    const validations = {
+      amountFrom: isValidAmountFrom(amountFrom, minFrom, maxFrom),
+      amountTo: isValidAmountTo(amountTo, minTo, maxTo),
+      purposePay: isValidPurposePay(purposePay),
+      email: isValidEmail(email),
+      kycAndAml: isValidKYCAndAML([isKYC, isAML])
+    }
+  
+    console.log('Результаты валидации:', validations)
+  
+    const hasErrors = Object.values(validations).some((error) => typeof error === 'string' )
+  
+    if (!hasErrors) {
       console.log('Все валидации пройдены успешно!')
+      // тут будет отдельный метод отправки запроса на бэк
       push('/completed_transaction')
     } else {
       console.log('Некоторые валидации не пройдены :(')
+  
+      const newEmptyState: Record<string, boolean> = {}
+      for (const [key, isError] of Object.entries(validations)) {
+        if (isError) newEmptyState[key] = false
+      }
+  
+      setIsEmpty((prev) => ({
+        ...prev,
+        ...newEmptyState
+      }))
     }
   }
+  
+
 
   const onInputChange = (
     setFunc: (value: string) => void,
