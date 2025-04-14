@@ -403,14 +403,15 @@ export const ExchangePage = () => {
               onChange={onCheckboxChange(setIsAML, 'isAML')}
             />
           </div>
-          <ValidationInput
-            isEmpty={!isEmpty.isAML && !isEmpty.isKYC}
-            validFunc={isValidKYCAndAML}
-            args={[[isKYC, isAML]]}
-          ></ValidationInput>
         </div>
         <Button>Начать обмен</Button>
       </div>
+      <ValidationInput
+        className='mt-2'
+        isEmpty={!isEmpty.isAML && !isEmpty.isKYC}
+        validFunc={isValidKYCAndAML}
+        args={[[isKYC, isAML]]}
+      ></ValidationInput>
     </div>
   )
 }

@@ -41,11 +41,10 @@ export const TX_FEE = '0.000006'
 export const MIN = '11'
 export const MAX = '30'
 
-export const MAX_SEND_ERROR = 'Ой, вы указали сумму больше 30 USDT. Пожалуйста, уменьшите её немного 😊'
-export const MIN_SEND_ERROR = 'Сумма слишком маленькая для обмена — попробуйте указать немного больше 💰'
-export const MAX_GET_ERROR = 'Похоже, сумма превышает доступный максимум (30 USDT минус комиссия). Попробуйте чуть меньше 💸'
-export const MIN_GET_ERROR = 'Сумма слишком мала после вычета комиссии. Попробуйте указать чуть больше, чтобы всё сработало 🧮'
-export const RECIPIENT_ADDRESS_ERROR = 'Упс! Адрес выглядит некорректно. Попробуйте формат P2PKH, P2SH или P2WPKH 📬'
-export const EMAIL_ERROR = 'Проверьте, пожалуйста, email — кажется, там опечатка ✉️'
-export const KYC_AML_ERROR = 'Чтобы мы могли продолжить, нужно ваше согласие с условиями — просто отметьте все чекбоксы ✅'
-
+export const MAX_SEND_ERROR = `Максимум ${MAX} USDT. Уменьшите сумму 😊`;
+export const MIN_SEND_ERROR = `Значение менее ${MIN} USDT. Увеличьте немного 💰`;
+export const MAX_GET_ERROR = `Превышен максимум (${MAX} USDT минус комиссия) 💸`;
+export const MIN_GET_ERROR = `Маленькое значение (${MIN} USDT минус комиссия) 🧮`;
+export const RECIPIENT_ADDRESS_ERROR = 'Некорректный адрес (P2PKH/P2SH/P2WPKH) 📬';
+export const EMAIL_ERROR = 'Проверьте email — есть опечатка ✉️';
+export const KYC_AML_ERROR = 'Отметьте чекбоксы для продолжения ✅';
