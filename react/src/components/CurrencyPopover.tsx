@@ -38,9 +38,9 @@ export const CurrencyPopover = ({
     <Popover>
       <PopoverButton
         className={clsx(
-          'absolute top-11 right-2 flex h-8 focus:outline-none',
+          'absolute top-8 right-2 flex h-8 focus:outline-none',
           'cursor-pointer items-end justify-center',
-          'rounded-lg px-3 py-2 text-xl leading-5 hover:opacity-90',
+          'rounded-lg px-3 py-2 text-sm leading-5 hover:opacity-90',
           currColor
         )}
       >
@@ -67,7 +67,7 @@ export const CurrencyPopover = ({
         <SearchWrapper>
           <Input
             placeholder="Введите название или тикер"
-            className="h-14 w-80 border-[#21284b] pl-10"
+            className="h-10 w-70 border-[#21284b] pl-10 text-sm"
             value={inputValue}
             onChange={onInputChange}
           />
@@ -79,7 +79,7 @@ export const CurrencyPopover = ({
             <Fragment key={option.curr}>
               <PopoverButton
                 className={clsx(
-                  'w-full cursor-pointer p-2 font-semibold last-of-type:rounded-b-lg hover:bg-[#29315c]',
+                  'w-full cursor-pointer text-sm p-2 last-of-type:rounded-b-lg hover:bg-[#29315c]',
                   option.currColor
                 )}
                 onClick={() => {
@@ -90,7 +90,7 @@ export const CurrencyPopover = ({
                   <div className="flex items-center justify-center">
                     <ReactSVG
                       src={getPath(option.currSvgPath)}
-                      className="mr-1 h-[24px] w-[24px]"
+                      className="mr-1 h-[20px] w-[20px]"
                     />
                     <div>{`${option.currIssuer || ''}(${option.currBlockchain})`}</div>
                   </div>

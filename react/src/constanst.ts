@@ -41,10 +41,10 @@ export const TX_FEE = '0.000006'
 export const MIN = '11'
 export const MAX = '30'
 
-export const MAX_SEND_ERROR = `Максимум ${MAX} USDT. Уменьшите сумму 😊`;
-export const MIN_SEND_ERROR = `Значение менее ${MIN} USDT. Увеличьте немного 💰`;
-export const MAX_GET_ERROR = `Превышен максимум (${MAX} USDT минус комиссия) 💸`;
-export const MIN_GET_ERROR = `Маленькое значение (${MIN} USDT минус комиссия) 🧮`;
-export const RECIPIENT_ADDRESS_ERROR = 'Некорректный адрес (P2PKH/P2SH/P2WPKH) 📬';
-export const EMAIL_ERROR = 'Проверьте email — есть опечатка ✉️';
-export const KYC_AML_ERROR = 'Отметьте чекбоксы для продолжения ✅';
+export const MAX_SEND_ERROR = `Максимум ${MAX} USDT. Уменьшите сумму`;
+export const MIN_SEND_ERROR = `Значение менее ${MIN} USDT. Увеличьте немного`;
+export const MAX_GET_ERROR = `Превышен максимум (${MAX} USDT минус комиссия)`;
+export const MIN_GET_ERROR = `Маленькое значение (${MIN} USDT минус комиссия)`;
+export const RECIPIENT_ADDRESS_ERROR = 'Некорректный адрес (P2PKH/P2SH/P2WPKH)';
+export const EMAIL_ERROR = 'Проверьте email — есть опечатка ';
+export const KYC_AML_ERROR = 'Отметьте чекбоксы для продолжения';

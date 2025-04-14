@@ -18,7 +18,7 @@ export const CurrencyRateInfo = ({
 }: Props) => (
   <div
     className={clsx(
-      'flex h-5 justify-between px-4 text-sm text-gray-400',
+      'flex h-5 justify-between px-4 text-xs text-gray-400',
       'transition-all duration-300 ease-in-out',
       'translate-y-0 opacity-100',
       'peer-focus:pointer-events-none peer-focus:-translate-y-1 peer-focus:opacity-0',

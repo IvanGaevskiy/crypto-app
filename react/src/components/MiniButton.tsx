@@ -19,7 +19,7 @@ export const MiniButton = ({
     <button
       className={clsx(
         'cursor-pointer bg-[#0f101b71]',
-        'flex items-center justify-center rounded-md px-3 py-3 text-sm',
+        'flex items-center justify-center rounded-md px-3 py-3 text-xs',
         className
       )}
       {...rest}

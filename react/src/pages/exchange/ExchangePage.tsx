@@ -263,13 +263,13 @@ export const ExchangePage = () => {
         <div className="flex flex-col">
           <div className="relative">
             <div className={clsx('flex flex-col space-y-1', currColorFrom)}>
-              <div className="flex justify-between px-4 font-semibold">
+              <div className="flex justify-between px-4 text-sm">
                 <label className="cursor-default">Отправляете</label>
                 <div>{currFrom}</div>
               </div>
               <Input
                 className={clsx(
-                  'peer h-14 w-80 !bg-[#000000b0] pr-32 text-2xl',
+                  'peer h-10 w-70 !bg-[#000000b0] pr-32 text-sm',
                   currBorderFrom,
                   currColorFrom
                 )}
@@ -279,7 +279,7 @@ export const ExchangePage = () => {
                 type="number"
               />
               <ValidationInput
-                className={clsx('absolute top-30')}
+                className={clsx('absolute top-24 w-full')}
                 isEmpty={isEmpty.amountFrom}
                 validFunc={isValidAmountFrom}
                 args={[amountFrom, minFrom, maxFrom]}
@@ -323,13 +323,13 @@ export const ExchangePage = () => {
         <div className="flex flex-col">
           <div className="relative">
             <div className={clsx('flex flex-col space-y-1', currColorTo)}>
-              <div className="flex justify-between px-4 font-semibold">
+              <div className="flex justify-between px-4 text-sm">
                 <label className="cursor-default">Получаете</label>
                 <div>{currTo}</div>
               </div>
               <Input
                 className={clsx(
-                  'peer h-14 w-80 !bg-[#000000b0] pr-32 text-2xl',
+                  'peer h-10 w-70 !bg-[#000000b0] pr-32 text-sm',
                   currBorderTo,
                   currColorTo
                 )}
@@ -339,7 +339,7 @@ export const ExchangePage = () => {
                 type="number"
               />
               <ValidationInput
-                className={clsx('absolute top-30')}
+                className={clsx('absolute top-24 w-full')}
                 isEmpty={isEmpty.amountTo}
                 validFunc={isValidAmountTo}
                 args={[amountTo, minTo, maxTo]}
@@ -371,12 +371,38 @@ export const ExchangePage = () => {
           </div>
         </div>
       </div>
-      <div
-        className={clsx(
-          'mt-12 mb-2 flex justify-between border border-dashed border-gray-400',
-          'gap-4 rounded-md !bg-[#1e235f] p-2 px-4'
-        )}
-      >
+      <div className="mb-2">
+        <label className="block cursor-default pl-4 text-left text-xs text-gray-400">
+          Назначение
+        </label>
+        <Input
+          className={clsx('mb-0.5 h-10 w-full border-0 !bg-[#000000b0] text-sm text-white')}
+          value={purposePay}
+          onChange={onInputChange(setPurposePay, 'purposePay')}
+          placeholder="Введите назначение перевода"
+        />
+        <ValidationInput
+          isEmpty={isEmpty.purposePay}
+          validFunc={isValidPurposePay}
+          args={[purposePay]}
+        ></ValidationInput>
+      </div>
+      <div className="mb-2">
+        <label className="block cursor-default pl-4 text-left text-xs text-gray-400">Email</label>
+        <Input
+          className={clsx('mb-0.5 h-10 w-full border-0 !bg-[#000000b0] text-sm text-white')}
+          value={email}
+          onChange={onInputChange(setEmail, 'email')}
+          placeholder="Введите email"
+        />
+        <ValidationInput
+          isEmpty={isEmpty.email}
+          validFunc={isValidEmail}
+          args={[email]}
+        ></ValidationInput>
+      </div>
+      <div className=" border-b-1 border-b-[#ffffff81] mb-1 mt-1" />
+      <div className={clsx('flex justify-between', 'gap-4 rounded-md')}>
         <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none')}>
           <div>{`Комиссия обменника ${exhangerFee} ${currTo}`}</div>
           <div>{`Комиссия майнеров ${mainersFee} ${currTo}`}</div>
@@ -389,54 +415,27 @@ export const ExchangePage = () => {
           onChange={onCheckboxChange(setIsShowFee)}
         />
       </div>
-      <div className="mb-2">
-        <label className="block cursor-default pl-4 text-left text-gray-400">Назначение</label>
-        <Input
-          className={clsx('mb-0.5 h-14 w-full !bg-[#000000b0] text-white')}
-          value={purposePay}
-          onChange={onInputChange(setPurposePay, 'purposePay')}
-          placeholder="Введите назначение перевода"
-        />
-        <ValidationInput
-          isEmpty={isEmpty.purposePay}
-          validFunc={isValidPurposePay}
-          args={[purposePay]}
-        ></ValidationInput>
-      </div>
-      <div className="mb-2">
-        <label className="block cursor-default pl-4 text-left text-gray-400">Email</label>
-        <Input
-          className={clsx('mb-0.5 h-14 w-full !bg-[#000000b0] text-white')}
-          value={email}
-          onChange={onInputChange(setEmail, 'email')}
-          placeholder="Введите email"
-        />
-        <ValidationInput
-          isEmpty={isEmpty.email}
-          validFunc={isValidEmail}
-          args={[email]}
-        ></ValidationInput>
-      </div>
+      <div className=" border-b-1 border-b-[#ffffff81] mb-1 mt-1" />
       <div className="flex justify-between">
         <div>
           <div className="flex flex-col items-start gap-1">
             <Checkbox
               text="Согласие с политикой конфиденциальности"
-              className="accent-[#3e5ca7]"
-              textClassName="text-gray-400 text-sm"
+              className="!w-3 accent-[#3e5ca7]"
+              textClassName="text-gray-400 text-xs"
               checked={isKYC}
               onChange={onCheckboxChange(setIsKYC, 'isKYC')}
             />
             <Checkbox
               text="Согласие на обработку персональных данных"
-              className="accent-[#3e5ca7]"
-              textClassName="text-gray-300 text-sm"
+              className="!w-3 accent-[#3e5ca7]"
+              textClassName="text-gray-400 text-xs"
               checked={isAML}
               onChange={onCheckboxChange(setIsAML, 'isAML')}
             />
           </div>
         </div>
-        <Button onClick={startExchangeSubmit} type="submit">
+        <Button onClick={startExchangeSubmit} type="submit" className="!h-9 text-sm">
           Начать обмен
         </Button>
       </div>

@@ -10,7 +10,7 @@ export const SearchWrapper = ({children}: HTMLProps<HTMLDivElement>) => {
     <div className={clsx('relative')}>
       <ReactSVG
         src={getPath('search.svg')}
-        className={clsx('absolute top-4 left-3 mr-1 h-[24px] w-[24px]')}
+        className={clsx('absolute top-2 left-3 mr-1 h-[10px] w-[10px]')}
       />
       {children}
     </div>

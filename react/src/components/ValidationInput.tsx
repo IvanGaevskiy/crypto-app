@@ -23,7 +23,7 @@ export const ValidationInput = <T extends any[]>({
   return (
     <div
       className={clsx(
-        'rounded-md text-red-400 border bg-[#000000b0] p-1 text-xs',
+        'rounded-md text-[#ff5858ae] bg-[#23232377] py-2 px-1 text-xs',
         className
       )}
     >
