@@ -10,10 +10,17 @@ import { Input } from '../../components/Input'
 import { MinMaxContainer } from '../../components/MinMaxContainer'
 import { MiniButton } from '../../components/MiniButton'
 import { ReverseButton } from '../../components/ReverseButton'
+import { ValidationInput } from '../../components/ValidationInput'
 import { CURRENCY_OPTIONS, EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
 import { numCut } from '../../utils/numCut'
 import { onCheckboxChange } from '../../utils/onCheckboxChange'
-import { onInputChange } from '../../utils/onInputChange'
+import {
+  isValidAmountFrom,
+  isValidAmountTo,
+  isValidEmail,
+  isValidKYCAndAML,
+  isValidPurposePay
+} from '../../validations'
 import { getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
 
@@ -41,9 +48,20 @@ export const ExchangePage = () => {
   const [isShowFee, setIsShowFee] = useState(true)
   const [isKYC, setIsKYC] = useState(true)
   const [isAML, setIsAML] = useState(true)
+  const [wasTouched, setWasTouched] = useState(false)
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
+
+  const onInputChange = (setFunc: (value: string) => void, defaultZero: boolean = false) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = defaultZero && e.target.value === '' ? '0' : e.target.value
+      const isTouched = value !== '' && value !== '0'
+
+      setFunc(value)
+      setWasTouched(isTouched)
+    }
+  }
 
   const currencyReverse = () => {
     setIsReversing(true)
@@ -85,19 +103,23 @@ export const ExchangePage = () => {
 
     const priceBTC = getPriceUSD('BTC', dataCurrAPI)
 
-    const min = limitAfterFees(priceBTC, MIN)
-    const max = limitAfterFees(priceBTC, MAX)
+    const minAfterFees = limitAfterFees(priceBTC, MIN)
+    const maxAfterFees = limitAfterFees(priceBTC, MAX)
 
-    const resultMaxFrom = numCut(max.div(from).abs())
-    const resultMaxTo = numCut(max.div(to).abs())
+    const min = new Decimal(MIN)
+    const max = new Decimal(MAX)
+
     const resultMinFrom = numCut(min.div(from).abs())
-    const resultMinTo = numCut(min.div(to).abs())
+    const resultMaxFrom = numCut(max.div(from).abs())
 
-    setMaxFrom(resultMaxFrom.toString())
-    setMaxTo(resultMaxTo.toString())
+    const resultMinTo = numCut(minAfterFees.div(to).abs())
+    const resultMaxTo = numCut(maxAfterFees.div(to).abs())
 
     setMinFrom(resultMinFrom.toString())
+    setMaxFrom(resultMaxFrom.toString())
+
     setMinTo(resultMinTo.toString())
+    setMaxTo(resultMaxTo.toString())
   }
 
   const fetchPrices = async () => {
@@ -215,11 +237,16 @@ export const ExchangePage = () => {
                   currColorFrom
                 )}
                 value={amountFrom}
-                onChange={onInputChange(setAmountFrom)}
+                onChange={onInputChange(setAmountFrom, true)}
                 maxLength={13}
                 type="number"
               />
-
+              <ValidationInput
+                className={clsx('absolute top-30')}
+                wasTouched={wasTouched}
+                validFunc={isValidAmountFrom}
+                args={[amountFrom, minFrom, maxFrom]}
+              ></ValidationInput>
               <CurrencyRateInfo
                 currFrom={currFrom}
                 currTo={currTo}
@@ -270,10 +297,16 @@ export const ExchangePage = () => {
                   currColorTo
                 )}
                 value={amountTo}
-                onChange={onInputChange(setAmountTo)}
+                onChange={onInputChange(setAmountTo, true)}
                 maxLength={13}
                 type="number"
               />
+              <ValidationInput
+                className={clsx('absolute top-30')}
+                wasTouched={wasTouched}
+                validFunc={isValidAmountTo}
+                args={[amountTo, minTo, maxTo]}
+              ></ValidationInput>
               <CurrencyRateInfo
                 currFrom={currTo}
                 currTo={currFrom}
@@ -303,7 +336,7 @@ export const ExchangePage = () => {
       </div>
       <div
         className={clsx(
-          'mb-2 flex justify-between border border-dashed border-gray-400',
+          'mt-12 mb-2 flex justify-between border border-dashed border-gray-400',
           'gap-4 rounded-md !bg-[#1e235f] p-2 px-4'
         )}
       >
@@ -322,37 +355,54 @@ export const ExchangePage = () => {
       <div className="mb-2">
         <label className="block cursor-default pl-4 text-left text-gray-400">Назначение</label>
         <Input
-          className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
+          className={clsx('mb-0.5 h-14 w-full !bg-[#000000b0] text-white')}
           value={purposePay}
           onChange={onInputChange(setPurposePay)}
           placeholder="Введите назначение перевода"
         />
+        <ValidationInput
+          wasTouched={wasTouched}
+          validFunc={isValidPurposePay}
+          args={[purposePay]}
+        ></ValidationInput>
       </div>
       <div className="mb-2">
         <label className="block cursor-default pl-4 text-left text-gray-400">Email</label>
         <Input
-          className={clsx('h-14 w-full !bg-[#000000b0] text-white')}
+          className={clsx('mb-0.5 h-14 w-full !bg-[#000000b0] text-white')}
           value={email}
           onChange={onInputChange(setEmail)}
           placeholder="Введите email"
         />
+        <ValidationInput
+          wasTouched={wasTouched}
+          validFunc={isValidEmail}
+          args={[email]}
+        ></ValidationInput>
       </div>
       <div className="flex justify-between">
-        <div className="flex flex-col items-start gap-1">
-          <Checkbox
-            text="Согласие с политикой конфиденциальности"
-            className="accent-[#3e5ca7]"
-            textClassName="text-gray-400 text-sm"
-            checked={isKYC}
-            onChange={onCheckboxChange(setIsKYC)}
-          />
-          <Checkbox
-            text="Согласие на обработку персональных данных"
-            className="accent-[#3e5ca7]"
-            textClassName="text-gray-300 text-sm"
-            checked={isAML}
-            onChange={onCheckboxChange(setIsAML)}
-          />
+        <div>
+          <div className="flex flex-col items-start gap-1">
+            <Checkbox
+              text="Согласие с политикой конфиденциальности"
+              className="accent-[#3e5ca7]"
+              textClassName="text-gray-400 text-sm"
+              checked={isKYC}
+              onChange={onCheckboxChange(setIsKYC)}
+            />
+            <Checkbox
+              text="Согласие на обработку персональных данных"
+              className="accent-[#3e5ca7]"
+              textClassName="text-gray-300 text-sm"
+              checked={isAML}
+              onChange={onCheckboxChange(setIsAML)}
+            />
+          </div>
+          <ValidationInput
+            wasTouched={wasTouched}
+            validFunc={isValidKYCAndAML}
+            args={[[isKYC, isAML]]}
+          ></ValidationInput>
         </div>
         <Button>Начать обмен</Button>
       </div>
