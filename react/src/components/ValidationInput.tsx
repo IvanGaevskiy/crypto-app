@@ -4,20 +4,20 @@ type ValidationFunc<T extends any[]> = (...args: T) => string | null
 
 type ValidationInputProps<T extends any[]> = {
   className?: string
-  wasTouched?: boolean
+  isEmpty?: boolean
   validFunc: ValidationFunc<T>
   args: T
 }
 
 export const ValidationInput = <T extends any[]>({
   className,
-  wasTouched = false,
+  isEmpty = true,
   validFunc,
   args,
 }: ValidationInputProps<T>) => {
   const error = validFunc(...args)
 
-  if (!wasTouched) return null
+  if (isEmpty) return null
   if (!error) return null
 
   return (

@@ -13,7 +13,6 @@ import { ReverseButton } from '../../components/ReverseButton'
 import { ValidationInput } from '../../components/ValidationInput'
 import { CURRENCY_OPTIONS, EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
 import { numCut } from '../../utils/numCut'
-import { onCheckboxChange } from '../../utils/onCheckboxChange'
 import {
   isValidAmountFrom,
   isValidAmountTo,
@@ -48,18 +47,32 @@ export const ExchangePage = () => {
   const [isShowFee, setIsShowFee] = useState(true)
   const [isKYC, setIsKYC] = useState(true)
   const [isAML, setIsAML] = useState(true)
-  const [wasTouched, setWasTouched] = useState(false)
+  const [isEmpty, setIsEmpty] = useState<Record<string, boolean>>({})
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
 
-  const onInputChange = (setFunc: (value: string) => void, defaultZero: boolean = false) => {
+  const onInputChange = (
+    setFunc: (value: string) => void,
+    key: string,
+    defaultZero: boolean = false
+  ) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = defaultZero && e.target.value === '' ? '0' : e.target.value
-      const isTouched = value !== '' && value !== '0'
+      const isEmpty = value == '' || value == '0'
 
       setFunc(value)
-      setWasTouched(isTouched)
+      setIsEmpty((prev) => ({ ...prev, [key]: isEmpty }))
+    }
+  }
+
+  const onCheckboxChange = (setFunc: (value: boolean) => void, key?: string) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFunc(e.target.checked)
+      if (key) {
+        const isEmpty = !e.target.checked
+        setIsEmpty((prev) => ({ ...prev, [key]: isEmpty }))
+      }
     }
   }
 
@@ -237,13 +250,13 @@ export const ExchangePage = () => {
                   currColorFrom
                 )}
                 value={amountFrom}
-                onChange={onInputChange(setAmountFrom, true)}
+                onChange={onInputChange(setAmountFrom, 'amountFrom', true)}
                 maxLength={13}
                 type="number"
               />
               <ValidationInput
                 className={clsx('absolute top-30')}
-                wasTouched={wasTouched}
+                isEmpty={isEmpty.amountFrom}
                 validFunc={isValidAmountFrom}
                 args={[amountFrom, minFrom, maxFrom]}
               ></ValidationInput>
@@ -297,13 +310,13 @@ export const ExchangePage = () => {
                   currColorTo
                 )}
                 value={amountTo}
-                onChange={onInputChange(setAmountTo, true)}
+                onChange={onInputChange(setAmountTo, 'amountTo', true)}
                 maxLength={13}
                 type="number"
               />
               <ValidationInput
                 className={clsx('absolute top-30')}
-                wasTouched={wasTouched}
+                isEmpty={isEmpty.amountTo}
                 validFunc={isValidAmountTo}
                 args={[amountTo, minTo, maxTo]}
               ></ValidationInput>
@@ -357,11 +370,11 @@ export const ExchangePage = () => {
         <Input
           className={clsx('mb-0.5 h-14 w-full !bg-[#000000b0] text-white')}
           value={purposePay}
-          onChange={onInputChange(setPurposePay)}
+          onChange={onInputChange(setPurposePay, 'purposePay')}
           placeholder="Введите назначение перевода"
         />
         <ValidationInput
-          wasTouched={wasTouched}
+          isEmpty={isEmpty.purposePay}
           validFunc={isValidPurposePay}
           args={[purposePay]}
         ></ValidationInput>
@@ -371,11 +384,11 @@ export const ExchangePage = () => {
         <Input
           className={clsx('mb-0.5 h-14 w-full !bg-[#000000b0] text-white')}
           value={email}
-          onChange={onInputChange(setEmail)}
+          onChange={onInputChange(setEmail, 'email')}
           placeholder="Введите email"
         />
         <ValidationInput
-          wasTouched={wasTouched}
+          isEmpty={isEmpty.email}
           validFunc={isValidEmail}
           args={[email]}
         ></ValidationInput>
@@ -388,18 +401,18 @@ export const ExchangePage = () => {
               className="accent-[#3e5ca7]"
               textClassName="text-gray-400 text-sm"
               checked={isKYC}
-              onChange={onCheckboxChange(setIsKYC)}
+              onChange={onCheckboxChange(setIsKYC, 'isKYS')}
             />
             <Checkbox
               text="Согласие на обработку персональных данных"
               className="accent-[#3e5ca7]"
               textClassName="text-gray-300 text-sm"
               checked={isAML}
-              onChange={onCheckboxChange(setIsAML)}
+              onChange={onCheckboxChange(setIsAML, 'isAML')}
             />
           </div>
           <ValidationInput
-            wasTouched={wasTouched}
+            isEmpty={isEmpty.isKYC && isEmpty.isAML}
             validFunc={isValidKYCAndAML}
             args={[[isKYC, isAML]]}
           ></ValidationInput>
