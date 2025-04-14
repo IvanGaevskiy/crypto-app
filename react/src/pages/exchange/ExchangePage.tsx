@@ -212,7 +212,13 @@ export const ExchangePage = () => {
     const mainersFee = getTxFee(amountTo, courseFrom)
 
     setFees(exhangerFee, mainersFee)
-    setAmountFrom(String(numCut(value.times(courseTo))))
+    if (isShowFee) {
+      const allFees = exhangerFee.plus(mainersFee)
+      const valuePlusFees = value.plus(allFees)
+      setAmountFrom(String(numCut(valuePlusFees.times(courseTo))))
+    } else {
+      setAmountFrom(String(numCut(value.times(courseTo))))
+    }
 
     setTimeout(() => setIsAmountConvertFrom(false), 0)
   }
@@ -430,7 +436,9 @@ export const ExchangePage = () => {
             />
           </div>
         </div>
-        <Button onClick={startExchangeSubmit} type='submit'>Начать обмен</Button>
+        <Button onClick={startExchangeSubmit} type="submit">
+          Начать обмен
+        </Button>
       </div>
       <ValidationInput
         className="mt-2"
