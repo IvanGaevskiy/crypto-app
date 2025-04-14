@@ -393,7 +393,7 @@ export const ExchangePage = () => {
               className="accent-[#3e5ca7]"
               textClassName="text-gray-400 text-sm"
               checked={isKYC}
-              onChange={onCheckboxChange(setIsKYC, 'isKYS')}
+              onChange={onCheckboxChange(setIsKYC, 'isKYC')}
             />
             <Checkbox
               text="Согласие на обработку персональных данных"
@@ -404,7 +404,7 @@ export const ExchangePage = () => {
             />
           </div>
           <ValidationInput
-            isEmpty={isEmpty.isKYC && isEmpty.isAML}
+            isEmpty={!isEmpty.isAML && !isEmpty.isKYC}
             validFunc={isValidKYCAndAML}
             args={[[isKYC, isAML]]}
           ></ValidationInput>
