@@ -1,9 +1,11 @@
 import { InfoCard } from '../../components/InfoCard'
 import { InfoItem } from '../../components/InfoItem'
+import { useRouter } from '../../utils/userouter'
 
 export const CompletedTransactionPage = () => {
+  const {push} = useRouter()
   return (
-    <InfoCard>
+    <InfoCard onClick={() => push('/')}>
       <InfoItem title="Вы отправили" description="1000$" status="Успешно"></InfoItem>
       <InfoItem title="Вы получили" description="0.02092615 BTC" status="Успешно"></InfoItem>
       <InfoItem title="Комиссия обменника" description="0.0003120 BTC"></InfoItem>

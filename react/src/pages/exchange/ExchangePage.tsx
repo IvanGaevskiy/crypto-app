@@ -13,6 +13,7 @@ import { ReverseButton } from '../../components/ReverseButton'
 import { ValidationInput } from '../../components/ValidationInput'
 import { CURRENCY_OPTIONS, EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
 import { numCut } from '../../utils/numCut'
+import { useRouter } from '../../utils/userouter'
 import {
   isValidAmountFrom,
   isValidAmountTo,
@@ -48,9 +49,34 @@ export const ExchangePage = () => {
   const [isKYC, setIsKYC] = useState(true)
   const [isAML, setIsAML] = useState(true)
   const [isEmpty, setIsEmpty] = useState<Record<string, boolean>>({})
+  const { push } = useRouter()
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
+
+  const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    console.log('Начинаем валидацию...')
+
+    console.log('amountFrom:', isValidAmountFrom(amountFrom, minFrom, maxFrom))
+    console.log('amountTo:', isValidAmountTo(amountTo, minTo, maxTo))
+    console.log('purposePay:', isValidPurposePay(purposePay))
+    console.log('email:', isValidEmail(email))
+    console.log('KYC & AML:', isValidKYCAndAML([isKYC, isAML]))
+
+    if (
+      !isValidAmountFrom(amountFrom, minFrom, maxFrom) &&
+      !isValidAmountTo(amountTo, minTo, maxTo) &&
+      !isValidPurposePay(purposePay) &&
+      !isValidEmail(email) &&
+      !isValidKYCAndAML([isKYC, isAML])
+    ) {
+      console.log('Все валидации пройдены успешно!')
+      push('/completed_transaction')
+    } else {
+      console.log('Некоторые валидации не пройдены :(')
+    }
+  }
 
   const onInputChange = (
     setFunc: (value: string) => void,
@@ -404,10 +430,10 @@ export const ExchangePage = () => {
             />
           </div>
         </div>
-        <Button>Начать обмен</Button>
+        <Button onClick={startExchangeSubmit} type='submit'>Начать обмен</Button>
       </div>
       <ValidationInput
-        className='mt-2'
+        className="mt-2"
         isEmpty={!isEmpty.isAML && !isEmpty.isKYC}
         validFunc={isValidKYCAndAML}
         args={[[isKYC, isAML]]}
