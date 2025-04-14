@@ -115,7 +115,7 @@ export const ExchangePage = () => {
     const value = new Decimal(amount).times(EX_FEE)
     return value
   }
-  
+
   const getTxFee = (amount: string, rate: string) => {
     const ifBTC = currTo === 'BTC' ? new Decimal(TX_FEE) : new Decimal(rate).times(TX_FEE)
     const isNotAmount = new Decimal(amount).lte('0')
@@ -131,7 +131,7 @@ export const ExchangePage = () => {
     const value = new Decimal(amount).times(rate)
     const exhangerFee = value.times(EX_FEE)
     const mainersFee = getTxFee(amount, rate)
-    
+
     setFees(exhangerFee, mainersFee)
 
     if (isShowFee && amount === amountFrom) {
@@ -149,7 +149,7 @@ export const ExchangePage = () => {
     const value = new Decimal(amountTo)
     const exhangerFee = getExFee(amountTo)
     const mainersFee = getTxFee(amountTo, courseFrom)
-    
+
     setFees(exhangerFee, mainersFee)
 
     if (isShowFee) {
