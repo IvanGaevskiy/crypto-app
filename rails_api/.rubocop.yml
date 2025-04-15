@@ -1,7 +1,22 @@
-# Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+
+# Строгие проверки
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+
+Lint/UselessAssignment:
+  Enabled: true # Неиспользуемые переменные
+
+Rails/ApplicationController:
+  Enabled: true # Наследование от ApplicationController
+
+# Жёсткие проверки методов
+Lint/UnderscorePrefixedVariableName:
+  Enabled: true
+
+Lint/MissingSuper:
+  Enabled: true # Пропущен super в initialize
