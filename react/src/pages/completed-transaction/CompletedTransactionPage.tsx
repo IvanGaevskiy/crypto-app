@@ -3,7 +3,7 @@ import { InfoItem } from '../../components/InfoItem'
 import { useRouter } from '../../utils/userouter'
 
 export const CompletedTransactionPage = () => {
-  const {push} = useRouter()
+  const { push } = useRouter()
   return (
     <InfoCard onClick={() => push('/')}>
       <InfoItem title="Вы отправили" description="1000$" status="Успешно"></InfoItem>

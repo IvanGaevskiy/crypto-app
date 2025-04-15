@@ -57,7 +57,7 @@ export const ExchangePage = () => {
   const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     console.log('Начинаем валидацию...')
-  
+
     const validations = {
       amountFrom: isValidAmountFrom(amountFrom, minFrom, maxFrom),
       amountTo: isValidAmountTo(amountTo, minTo, maxTo),
@@ -65,31 +65,29 @@ export const ExchangePage = () => {
       email: isValidEmail(email),
       kycAndAml: isValidKYCAndAML([isKYC, isAML])
     }
-  
+
     console.log('Результаты валидации:', validations)
-  
-    const hasErrors = Object.values(validations).some((error) => typeof error === 'string' )
-  
+
+    const hasErrors = Object.values(validations).some((error) => typeof error === 'string')
+
     if (!hasErrors) {
       console.log('Все валидации пройдены успешно!')
       // тут будет отдельный метод отправки запроса на бэк
       push('/completed_transaction')
     } else {
       console.log('Некоторые валидации не пройдены :(')
-  
+
       const newEmptyState: Record<string, boolean> = {}
       for (const [key, isError] of Object.entries(validations)) {
         if (isError) newEmptyState[key] = false
       }
-  
+
       setIsEmpty((prev) => ({
         ...prev,
         ...newEmptyState
       }))
     }
   }
-  
-
 
   const onInputChange = (
     setFunc: (value: string) => void,
@@ -228,6 +226,7 @@ export const ExchangePage = () => {
     if (isShowFee) {
       const allFees = exhangerFee.plus(mainersFee)
       const valuePlusFees = value.plus(allFees)
+      console.log('valuePlusFees.times(courseTo)', valuePlusFees.times(courseTo).toString())
       setAmountFrom(String(numCut(valuePlusFees.times(courseTo))))
     } else {
       setAmountFrom(String(numCut(value.times(courseTo))))
@@ -296,7 +295,7 @@ export const ExchangePage = () => {
                 isEmpty={isEmpty.amountFrom}
                 validFunc={isValidAmountFrom}
                 args={[amountFrom, minFrom, maxFrom]}
-              ></ValidationInput>
+              />
               <CurrencyRateInfo
                 currFrom={currFrom}
                 currTo={currTo}
@@ -356,7 +355,7 @@ export const ExchangePage = () => {
                 isEmpty={isEmpty.amountTo}
                 validFunc={isValidAmountTo}
                 args={[amountTo, minTo, maxTo]}
-              ></ValidationInput>
+              />
               <CurrencyRateInfo
                 currFrom={currTo}
                 currTo={currFrom}
@@ -398,7 +397,7 @@ export const ExchangePage = () => {
           isEmpty={isEmpty.purposePay}
           validFunc={isValidPurposePay}
           args={[purposePay]}
-        ></ValidationInput>
+        />
       </div>
       <div className="mb-2">
         <label className="block cursor-default pl-4 text-left text-xs text-gray-400">Email</label>
@@ -408,13 +407,9 @@ export const ExchangePage = () => {
           onChange={onInputChange(setEmail, 'email')}
           placeholder="Введите email"
         />
-        <ValidationInput
-          isEmpty={isEmpty.email}
-          validFunc={isValidEmail}
-          args={[email]}
-        ></ValidationInput>
+        <ValidationInput isEmpty={isEmpty.email} validFunc={isValidEmail} args={[email]} />
       </div>
-      <div className=" border-b-1 border-b-[#ffffff81] mb-1 mt-1" />
+      <div className="mt-1 mb-1 border-b-1 border-b-[#ffffff81]" />
       <div className={clsx('flex justify-between', 'gap-4 rounded-md')}>
         <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none')}>
           <div>{`Комиссия обменника ${exhangerFee} ${currTo}`}</div>
@@ -428,7 +423,7 @@ export const ExchangePage = () => {
           onChange={onCheckboxChange(setIsShowFee)}
         />
       </div>
-      <div className=" border-b-1 border-b-[#ffffff81] mb-1 mt-1" />
+      <div className="mt-1 mb-1 border-b-1 border-b-[#ffffff81]" />
       <div className="flex justify-between">
         <div>
           <div className="flex flex-col items-start gap-1">
@@ -457,7 +452,7 @@ export const ExchangePage = () => {
         isEmpty={!isEmpty.isAML && !isEmpty.isKYC}
         validFunc={isValidKYCAndAML}
         args={[[isKYC, isAML]]}
-      ></ValidationInput>
+      />
     </div>
   )
 }
