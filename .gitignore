@@ -53,6 +53,7 @@ rails_api/test/tmp/
 
 # Прочее
 rails_api/.byebug_history
+rails_api/.env
 
 # REACT
 # Logs
