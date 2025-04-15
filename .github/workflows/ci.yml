@@ -6,7 +6,21 @@ on:
     branches: [ main ]
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      ruby-version: ${{ steps.read-ruby-version.outputs.ruby-version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read Ruby version from .ruby-version
+        id: read-ruby-version
+        run: echo "ruby-version=$(cat rails_api/.ruby-version)" >> $GITHUB_OUTPUT
+
   scan_ruby:
+    needs: setup
     runs-on: ubuntu-latest
 
     steps:
@@ -16,14 +30,17 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: .ruby-version
+          ruby-version: ${{ needs.setup.outputs.ruby-version }}
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
+        working-directory: rails_api
 
   lint:
+    needs: setup
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,21 +48,17 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: .ruby-version
+          ruby-version: ${{ needs.setup.outputs.ruby-version }}
           bundler-cache: true
 
       - name: Lint code for consistent style
         run: bin/rubocop -f github
+        working-directory: rails_api
 
   test:
+    needs: setup
     runs-on: ubuntu-latest
 
-    # services:
-    #  redis:
-    #    image: redis
-    #    ports:
-    #      - 6379:6379
-    #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config
@@ -56,11 +69,11 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: .ruby-version
+          ruby-version: ${{ needs.setup.outputs.ruby-version }}
           bundler-cache: true
 
       - name: Run tests
         env:
           RAILS_ENV: test
-          # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare test
+        working-directory: rails_api
