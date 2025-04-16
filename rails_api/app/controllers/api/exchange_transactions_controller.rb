@@ -2,10 +2,6 @@ class Api::ExchangeTransactionsController < ApplicationController
   def create
     exchange_transaction = ExchangeTransaction.new(transaction_params)
 
-    exchange_rates_params.each do |rate_params|
-      exchange_transaction.exchange_rate.build(rate_params)
-    end
-
     agreetments_params.each do |agreetment_param|
       exchange_transaction.agreetment.build(agreetment_param)
     end
@@ -20,18 +16,18 @@ class Api::ExchangeTransactionsController < ApplicationController
   private
 
   def transaction_params
-    params.permit(:recipient_address, :email, currency_amounts: [:currency, :amount])
-  end
-
-  def exchange_rates_params
-    params.require(:exchange_rates).map do |exchange_rate|
-      exchange_rate.permit(:currency_from, :currency_to, :rate)
-    end
+    params.permit(:recipient_address,
+                  :email,
+                  :currency_from,
+                  :currency_to,
+                  :amount_from,
+                  :amount_to,
+                  :rate)
   end
 
   def agreements_params
-    params.require(:agreetment_params).map do |agreetment_param|
-      agreetment_param.permit(:agreement_type, :approved)
+    params.require(:agreetments).map do |agreetment|
+      agreetment.permit(:agreement_type, :approved)
     end
   end
 end

@@ -3,7 +3,6 @@ class CreateAgreements < ActiveRecord::Migration[8.0]
     create_table :agreements do |t|
       t.string :agreement_type
       t.boolean :approved
-      t.datetime :approved_at
       t.references :exchange_transaction, null: false, foreign_key: true
 
       t.timestamps
