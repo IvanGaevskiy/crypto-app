@@ -6,9 +6,11 @@ require "bitcoin"
 Bitcoin.chain_params = BITCOIN_NETWORK
 
 class BitcoinTransactionService
+  exchange_wif = ENV.fetch("EXCHANGE_WIF")
+
   def initialize(recipient_address, amount_to)
     @recipient_address = recipient_address
-    @key = Bitcoin::Key.from_base58(ENV["EXCHANGE_WIF"])
+    @key = Bitcoin::Key.from_base58(exchange_wif)
     @amount_to = to_satoshi(amount_to)
   end
 
@@ -35,10 +37,10 @@ class BitcoinTransactionService
     end
 
     tx.add_out(Bitcoin::TxOut.value_to_address(@amount_to, @recipient_address))
-    tx.add_out(Bitcoin::TxOut.value_to_address(change, ENV["EXCHANGE_WIF"])) if change > 0
+    tx.add_out(Bitcoin::TxOut.value_to_address(change, exchange_wif)) if change > 0
 
     utxos.each_with_index do |utxo, index|
-      script = Bitcoin::Script.parse_from_addr(ENV["EXCHANGE_WIF"])
+      script = Bitcoin::Script.parse_from_addr(exchange_wif)
       sig_hash = tx.sighash_for_input(index, script)
       signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
       script_sig = Bitcoin::Script.to_p2pkh_sig_script(signature, @key.pubkey.htb)
@@ -51,7 +53,9 @@ class BitcoinTransactionService
   private
 
   def fetch_utxos
-    url = URI("#{ENV["MEMPOOL_API"]}/address/#{ENV["EXCHANGE_WIF"]}/utxo")
+    mempool_api = ENV.fetch("MEMPOOL_API")
+
+    url = URI("#{mempool_api}/address/#{exchange_wif}/utxo")
     res = Net::HTTP.get_response(url)
     JSON.parse(res.body)
   rescue => e

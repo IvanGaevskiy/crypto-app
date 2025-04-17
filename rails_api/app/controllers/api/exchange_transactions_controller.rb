@@ -9,11 +9,16 @@ class Api::ExchangeTransactionsController < ApplicationController
     if exchange_transaction.save
       begin
         raw_tx_hex = create_transaction(exchange_transaction)
+
+        decoded_hex = BlockcypherService.new(raw_hex).decode
+        puts decoded_hex
+
         exchange_transaction.update(success: "success")
+
         render json: {
                  status: "success",
                  transaction: exchange_transaction.as_json,
-                 hex: raw_tx_hex,
+                 raw_tx_hex: raw_tx_hex,
                }
       rescue => e
         exchange_transaction.update(success: "failed")

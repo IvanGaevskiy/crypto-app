@@ -6,3 +6,6 @@ CYRRENCY_FROM_TYPE = %w[USDT]
 CYRRENCY_TO_TYPE = %w[BTC]
 BITCOIN_NETWORK = :testnet
 MEMPOOL_API = "https://mempool.space/signet/api"
+
+BLOCKCYPHER_NETWORK = Rails.env.production? ? "signet" : "main"
+BLOCKCYPHER_BTC_API = "https://api.blockcypher.com/v1/btc/#{BLOCKCYPHER_NETWORK}/txs/decode"
