@@ -4,11 +4,11 @@ require "bitcoin"
 Bitcoin.chain_params = BITCOIN_NETWORK
 
 class BitcoinTransactionService
-  exchange_wif = ENV.fetch("EXCHANGE_WIF")
+  EXCHANGE_WIF = ENV.fetch("EXCHANGE_WIF")
 
   def initialize(recipient_address, amount_to)
     @recipient_address = recipient_address
-    @key = Bitcoin::Key.from_base58(exchange_wif)
+    @key = Bitcoin::Key.from_base58(EXCHANGE_WIF)
     @amount_to = to_satoshi(amount_to)
   end
 
@@ -35,10 +35,10 @@ class BitcoinTransactionService
     end
 
     tx.add_out(Bitcoin::TxOut.value_to_address(@amount_to, @recipient_address))
-    tx.add_out(Bitcoin::TxOut.value_to_address(change, exchange_wif)) if change > 0
+    tx.add_out(Bitcoin::TxOut.value_to_address(change, EXCHANGE_WIF)) if change > 0
 
     utxos.each_with_index do |utxo, index|
-      script = Bitcoin::Script.parse_from_addr(exchange_wif)
+      script = Bitcoin::Script.parse_from_addr(EXCHANGE_WIF)
       sig_hash = tx.sighash_for_input(index, script)
       signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
       script_sig = Bitcoin::Script.to_p2pkh_sig_script(signature, @key.pubkey.htb)
@@ -53,8 +53,7 @@ class BitcoinTransactionService
   def fetch_utxos
     mempool_api = ENV.fetch("MEMPOOL_API")
 
-    response = Faraday.get("#{mempool_api}/address/#{exchange_wif}/utxo")
-    JSON.parse(response.body)
+    response = Faraday.get("#{mempool_api}/address/#{EXCHANGE_WIF}/utxo")
 
     if !response.success
       Rails.logger.error("Ошибка в запросе UTXO: #{response.status} #{response.body}")

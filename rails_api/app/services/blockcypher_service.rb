@@ -7,12 +7,11 @@ class BlockcypherService
   end
 
   def decode
-    connection = Faraday.new(headers: { "Content-Type" => "application/json" })
+    connection = Faraday.new do |conn|
+      conn.headers["Content-Type"] = "application/json"
+    end
 
-    response = connection.post(
-      "#{BLOCKCYPHER_BTC_API}?token=#{@token}",
-      { tx: @raw_tx }.to_json
-    )
+    response = connection.post("#{BLOCKCYPHER_BTC_API}?token=#{@token}", { tx: @raw_tx }.to_json)
 
     if !response.success?
       raise "BlockCypher error: #{response.status} #{response.reason_phrase}"
