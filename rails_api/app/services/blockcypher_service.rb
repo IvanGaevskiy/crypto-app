@@ -14,9 +14,10 @@ class BlockcypherService
     response = connection.post("#{BLOCKCYPHER_BTC_API}?token=#{@token}", { tx: @raw_tx }.to_json)
 
     if !response.success?
-      raise "BlockCypher error: #{response.status} #{response.reason_phrase}"
+      raise "Ошибка при декодировании hex-транзакции: #{response.status} #{response.reason_phrase}"
     end
 
+    Rails.logger.info("Hex-транзакция успешно декодирована: #{response.body}")
     JSON.parse(response.body)
   end
 end

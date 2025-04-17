@@ -10,6 +10,7 @@ class BitcoinTransactionService
     @recipient_address = recipient_address
     @key = Bitcoin::Key.from_base58(EXCHANGE_WIF)
     @amount_to = to_satoshi(amount_to)
+    @raw_tx_hex = ""
   end
 
   def create_transaction
@@ -45,7 +46,23 @@ class BitcoinTransactionService
       tx.in[index].script_sig = script_sig
     end
 
-    tx.to_payload.bth
+    @raw_tx_hex = tx.to_payload.bth
+
+    @raw_tx_hex
+  end
+
+  def broadcast_transaction
+    response = Faraday.post("#{MEMPOOL_API}/tx") do |request|
+      request.headers["Content-Type"] = "text/plain"
+      request.body = @raw_tx_hex
+    end
+
+    if !response.success?
+      raise "Ошибка при бродкасте транзакции: #{response.status} — #{response.body}"
+    end
+
+    Rails.logger.info("Транзакция отправлена! TXID: #{response.body}")
+    response.body # txid
   end
 
   private
@@ -56,9 +73,10 @@ class BitcoinTransactionService
     response = Faraday.get("#{mempool_api}/address/#{EXCHANGE_WIF}/utxo")
 
     if !response.success
-      Rails.logger.error("Ошибка в запросе UTXO: #{response.status} #{response.body}")
+      raise "Ошибка в запросе UTXO: #{response.status} #{response.body}"
     end
 
+    Rails.logger.info("UTXOS успешно получены: #{response.body}")
     JSON.parse(response.body)
   end
 

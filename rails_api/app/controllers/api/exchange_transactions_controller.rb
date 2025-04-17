@@ -8,10 +8,13 @@ class Api::ExchangeTransactionsController < ApplicationController
 
     if exchange_transaction.save
       begin
-        raw_tx_hex = create_transaction(exchange_transaction)
+        transaction_service = init_transaction(exchange_transaction)
+        raw_tx_hex = transaction_service.create_transaction
 
-        decoded_hex = BlockcypherService.new(raw_hex).decode
-        puts decoded_hex
+        decoded_hex = BlockcypherService.new(raw_tx_hex).decode
+        Rails.logger.info decoded_hex
+
+        transaction_service.broadcast_transaction
 
         exchange_transaction.update(success: "success")
 
@@ -54,11 +57,10 @@ class Api::ExchangeTransactionsController < ApplicationController
     end
   end
 
-  def create_transaction(exchange_transaction, service_class = BitcoinTransactionService)
+  def init_transaction(exchange_transaction, service_class = BitcoinTransactionService)
     recipient_address = exchange_transaction.recipient_address
     amount_satoshi = exchange_transaction.amount_to
 
     btc_service = service_class.new(recipient_address, amount_satoshi)
-    btc_service.create_transaction
   end
 end
