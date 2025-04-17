@@ -1,9 +1,9 @@
 require "bitcoin"
 
-class BitcoinService
-  Bitcoin.network = :testnet
+class BitcoinValidationService
+  Bitcoin.network = BITCOIN_NETWORK
 
-  def self.valid_bitcoin_address?(address)
+  def self.address_valid?(address)
     Bitcoin::Script.parse_from_addr(address) != nil
   rescue
     false

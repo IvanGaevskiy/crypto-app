@@ -4,3 +4,5 @@ MIN_AMOUNT = "11"
 MAX_AMOUNT = "30"
 CYRRENCY_FROM_TYPE = %w[USDT]
 CYRRENCY_TO_TYPE = %w[BTC]
+BITCOIN_NETWORK = :testnet
+MEMPOOL_API = "https://mempool.space/signet/api"

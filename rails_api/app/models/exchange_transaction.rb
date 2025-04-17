@@ -39,7 +39,7 @@ class ExchangeTransaction < ApplicationRecord
       return
     end
 
-    if !BitcoinService.valid_bitcoin_address?(recipient_address)
+    if !BitcoinValidationService.adress_valid?(recipient_address)
       errors.add(:recipient_address, "Не соответствует форматам P2PKH, P2SH, P2WPHK")
     end
   end
