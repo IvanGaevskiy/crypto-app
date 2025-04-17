@@ -1,5 +1,3 @@
-require "net/http"
-require "uri"
 require "json"
 require "bitcoin"
 
@@ -55,12 +53,14 @@ class BitcoinTransactionService
   def fetch_utxos
     mempool_api = ENV.fetch("MEMPOOL_API")
 
-    url = URI("#{mempool_api}/address/#{exchange_wif}/utxo")
-    res = Net::HTTP.get_response(url)
-    JSON.parse(res.body)
-  rescue => e
-    Rails.logger.error("Ошибка в запросе UTXO: #{e.message}")
-    []
+    response = Faraday.get("#{mempool_api}/address/#{exchange_wif}/utxo")
+    JSON.parse(response.body)
+
+    if !response.success
+      Rails.logger.error("Ошибка в запросе UTXO: #{response.status} #{response.body}")
+    end
+
+    JSON.parse(response.body)
   end
 
   def to_satoshi(amount)
