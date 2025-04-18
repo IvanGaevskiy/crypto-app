@@ -19,22 +19,22 @@ class Api::ExchangeTransactionsController < ApplicationController
         exchange_transaction.update(success: "success")
 
         render json: {
-                 status: "success",
-                 transaction: exchange_transaction.as_json,
-                 raw_tx_hex: raw_tx_hex,
-               }
-      rescue => e
+          status: "success",
+          transaction: exchange_transaction.as_json,
+          raw_tx_hex: raw_tx_hex
+        }
+      rescue StandardError => e
         exchange_transaction.update(success: "failed")
         render json: {
-                 status: "error",
-                 message: "Ошибка при сборке транзакции: #{e.message}",
-               }, status: :unprocessable_entity
+          status: "error",
+          message: "Ошибка при сборке транзакции: #{e.message}"
+        }, status: :unprocessable_entity
       end
     else
       exchange_transaction.update(success: "failed")
       render json: {
         status: "error",
-        errors: exchange_transaction.errors.full_messages,
+        errors: exchange_transaction.errors.full_messages
       }, status: :unprocessable_entity
     end
   end
@@ -59,8 +59,8 @@ class Api::ExchangeTransactionsController < ApplicationController
 
   def init_transaction(exchange_transaction, service_class = BitcoinTransactionService)
     recipient_address = exchange_transaction.recipient_address
-    amount_satoshi = exchange_transaction.amount_to
+    amount_to = exchange_transaction.amount_to
 
-    btc_service = service_class.new(recipient_address, amount_satoshi)
+    service_class.new(recipient_address, amount_to)
   end
 end

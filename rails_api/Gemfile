@@ -1,8 +1,8 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 8.0.2"
 gem "pg", "~> 1.5", ">= 1.5.9"
 gem "puma", ">= 5.0"
+gem "rails", "~> 8.0.2"
 gem "solid_cache"
 gem "solid_queue"
 
@@ -15,17 +15,19 @@ gem "bitcoinrb", require: "bitcoin"
 
 gem "faraday", "~> 2.13"
 
+gem "solargraph", group: :development
+
 group :development, :test do
-  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
   gem "brakeman", require: false
-  gem "rubocop-rails-omakase", require: false
+  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
   gem "dotenv", "~> 3.1", ">= 3.1.7"
+  gem "rubocop-rails-omakase", require: false
 end
 
 group :test do
-  gem "rspec-rails", "~> 7.1", ">= 7.1.1"
-  gem "factory_bot_rails", "~> 6.4", ">= 6.4.4"
   gem "database_cleaner-active_record", "~> 2.2", ">= 2.2.0"
-  gem "shoulda-matchers", "~> 6.4"
+  gem "factory_bot_rails", "~> 6.4", ">= 6.4.4"
   gem "faker", "~> 3.5", ">= 3.5.1"
+  gem "rspec-rails", "~> 7.1", ">= 7.1.1"
+  gem "shoulda-matchers", "~> 6.4"
 end

@@ -1,0 +1,33 @@
+---
+bundler: true
+include:
+  - "**/*.rb"
+  - "config.ru"
+
+exclude:
+  - "spec/**/*"
+  - "test/**/*"
+  - "vendor/**/*"
+  - ".bundle/**/*"
+  - "db/schema.rb"
+
+require: []
+
+domains: []
+
+reporters:
+  - rubocop
+  - require_not_found
+
+formatter:
+  rubocop:
+    enabled: true
+    config_file: .rubocop.yml
+
+require_paths:
+  - "app"
+  - "lib"
+
+plugins: []
+
+max_files: 10000
