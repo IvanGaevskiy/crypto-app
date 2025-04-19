@@ -26,3 +26,13 @@ Lint/UselessAssignment:
 
 Style/Documentation:
   Enabled: false
+
+Style/NegatedIf:
+  Enabled: false
+
+Style/NegatedUnless:
+  Enabled: true
+  EnforcedStyle: both
+
+Style/GuardClause:
+  Enabled: false

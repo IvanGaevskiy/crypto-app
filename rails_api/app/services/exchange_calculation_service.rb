@@ -1,7 +1,7 @@
 require "bigdecimal"
 require "bigdecimal/util"
 
-class ExchangeCalculatorService
+class ExchangeCalculationService
   def self.get_exchanger_fee(amount_from)
     amount_from.to_d * EX_FEE.to_d
   end
@@ -15,6 +15,7 @@ class ExchangeCalculatorService
     miners_fee = get_miners_fee(currency_from, rate)
 
     all_fees = exchanger_fee + miners_fee
-    (amount_from - all_fees).round(8)
+    amount_after_fees = amount_from - all_fees
+    (amount_after_fees / rate).abs
   end
 end

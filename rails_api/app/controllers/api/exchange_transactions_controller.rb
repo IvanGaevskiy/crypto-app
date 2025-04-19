@@ -1,40 +1,40 @@
 class Api::ExchangeTransactionsController < ApplicationController
   def create
-    exchange_transaction = ExchangeTransaction.new(transaction_params, success: "processing")
+    exchange_transaction = nil
 
-    agreetments_params.each do |agreetment_param|
-      exchange_transaction.agreetment.build(agreetment_param)
+    ExchangeTransaction.transaction do
+      exchange_transaction = ExchangeTransaction.create!(transaction_params)
+      exchange_transaction.agreements.create!(agreements_params)
     end
 
-    if exchange_transaction.save
-      begin
-        transaction_service = init_transaction(exchange_transaction)
-        raw_tx_hex = transaction_service.create_transaction
-
-        decoded_hex = BlockcypherService.new(raw_tx_hex).decode
-        Rails.logger.info decoded_hex
-
-        transaction_service.broadcast_transaction
-
-        exchange_transaction.update(success: "success")
-
-        render json: {
-          status: "success",
-          transaction: exchange_transaction.as_json,
-          raw_tx_hex: raw_tx_hex
-        }
-      rescue StandardError => e
-        exchange_transaction.update(success: "failed")
-        render json: {
-          status: "error",
-          message: "Ошибка при сборке транзакции: #{e.message}"
-        }, status: :unprocessable_entity
-      end
-    else
-      exchange_transaction.update(success: "failed")
+    if !exchange_transaction.persisted?
       render json: {
         status: "error",
-        errors: exchange_transaction.errors.full_messages
+        errors: "Ошибка входных данных: #{exchange_transaction.errors.full_messages}"
+      }, status: :unprocessable_entity
+    end
+
+    begin
+      # transaction_service = init_transaction(exchange_transaction)
+      # raw_tx_hex = transaction_service.create_transaction
+
+      # decoded_hex = BlockcypherService.new(raw_tx_hex).decode
+      # Rails.logger.info decoded_hex
+
+      # transaction_service.broadcast_transaction
+      raise "ERROR POINT SUCCESFULL!!!"
+      exchange_transaction.update(status: "success")
+
+      render json: {
+        status: "success",
+        transaction: exchange_transaction.as_json,
+        raw_tx_hex: raw_tx_hex
+      }
+    rescue StandardError => e
+      exchange_transaction.update(status: "failed")
+      render json: {
+        status: "error",
+        message: "Ошибка при сборке транзакции: #{e.message}"
       }, status: :unprocessable_entity
     end
   end
@@ -48,13 +48,12 @@ class Api::ExchangeTransactionsController < ApplicationController
                   :currency_to,
                   :amount_from,
                   :amount_to,
-                  :rate)
+                  :rate,
+                  :recorded_at)
   end
 
   def agreements_params
-    params.require(:agreetments).map do |agreetment|
-      agreetment.permit(:agreement_type, :approved)
-    end
+    params.permit(agreements: %i[agreement_type approved])[:agreements]
   end
 
   def init_transaction(exchange_transaction, service_class = BitcoinTransactionService)

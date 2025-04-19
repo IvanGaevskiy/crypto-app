@@ -4,11 +4,12 @@ require "bitcoin"
 Bitcoin.chain_params = BITCOIN_NETWORK
 
 class BitcoinTransactionService
-  EXCHANGE_WIF = ENV.fetch("EXCHANGE_WIF")
+  EXCHANGE_ADRESS = ENV.fetch("EXCHANGE_ADRESS")
+  EXCHANGE_PRIVATE_KEY = ENV.fetch("EXCHANGE_PRIVATE_KEY")
 
   def initialize(recipient_address, amount_to)
     @recipient_address = recipient_address
-    @key = Bitcoin::Key.from_base58(EXCHANGE_WIF)
+    @key = Bitcoin::Key.from_base58(EXCHANGE_PRIVATE_KEY)
     @amount_to = to_satoshi(amount_to)
     @raw_tx_hex = ""
   end
@@ -20,6 +21,7 @@ class BitcoinTransactionService
     total_input = utxos.sum { |u| u["value"] }
     fee = estimate_tx_fee(utxos.count)
     return nil if total_input < @amount_to + fee
+
     change = total_input - @amount_to - fee
     return nil if change <= 0
 
@@ -30,19 +32,19 @@ class BitcoinTransactionService
         Bitcoin::TxIn.new(
           prev_out: [utxo["txid"]].pack("H*").reverse + [utxo["vout"]].pack("V"),
           script_sig: "",
-          sequence: "\xff\xff\xff\xff",
+          sequence: "\xff\xff\xff\xff"
         )
       )
     end
 
     tx.add_out(Bitcoin::TxOut.value_to_address(@amount_to, @recipient_address))
-    tx.add_out(Bitcoin::TxOut.value_to_address(change, EXCHANGE_WIF)) if change > 0
+    tx.add_out(Bitcoin::TxOut.value_to_address(change, EXCHANGE_ADRESS)) if change > 0
 
-    utxos.each_with_index do |utxo, index|
-      script = Bitcoin::Script.parse_from_addr(EXCHANGE_WIF)
+    utxos.each_with_index do |_utxo, index|
+      script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADRESS)
       sig_hash = tx.sighash_for_input(index, script)
       signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
-      script_sig = Bitcoin::Script.to_p2pkh_sig_script(signature, @key.pubkey.htb)
+      script_sig = Bitcoin::Script.to_p2pkh_sig_script(signature, EXCHANGE_PUB_KEY.htb)
       tx.in[index].script_sig = script_sig
     end
 
@@ -57,9 +59,7 @@ class BitcoinTransactionService
       request.body = @raw_tx_hex
     end
 
-    if !response.success?
-      raise "Ошибка при бродкасте транзакции: #{response.status} — #{response.body}"
-    end
+    raise "Ошибка при бродкасте транзакции: #{response.status} — #{response.body}" unless response.success?
 
     Rails.logger.info("Транзакция отправлена! TXID: #{response.body}")
     response.body # txid
@@ -70,11 +70,9 @@ class BitcoinTransactionService
   def fetch_utxos
     mempool_api = ENV.fetch("MEMPOOL_API")
 
-    response = Faraday.get("#{mempool_api}/address/#{EXCHANGE_WIF}/utxo")
+    response = Faraday.get("#{mempool_api}/address/#{EXCHANGE_ADRESS}/utxo")
 
-    if !response.success
-      raise "Ошибка в запросе UTXO: #{response.status} #{response.body}"
-    end
+    raise "Ошибка в запросе UTXO: #{response.status} #{response.body}" unless response.success
 
     Rails.logger.info("UTXOS успешно получены: #{response.body}")
     JSON.parse(response.body)
@@ -85,7 +83,7 @@ class BitcoinTransactionService
   end
 
   def estimate_tx_fee(input_count, output_count = 2, fee_per_byte = 2)
-    size = input_count * 148 + output_count * 34 + 10
+    size = (input_count * 148) + (output_count * 34) + 10
     size * fee_per_byte
   end
 end

@@ -11,9 +11,6 @@ class CreateExchangeTransactions < ActiveRecord::Migration[8.0]
       t.string :email
       t.string :status
 
-      t.references :agreements, null: false, foreign_key: true
-      t.references :exchange_rate, null: false, foreign_key: true
-
       t.timestamps
     end
   end
