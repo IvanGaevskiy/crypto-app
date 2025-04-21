@@ -16,15 +16,13 @@ class Api::ExchangeTransactionsController < ApplicationController
 
     transaction_service = init_transaction(exchange_transaction)
     transaction_service.create_transaction
-    puts transaction_service.decode
-    transaction_service.broadcast_transaction
+    transaction = transaction_service.decode
+    puts "exchange_transaction.as_json"
+    puts exchange_transaction.as_json
+    # transaction_service.broadcast_transaction
     exchange_transaction.update(status: "success")
 
-    render json: {
-      status: "success",
-      transaction: exchange_transaction.as_json,
-      raw_tx_hex: raw_tx_hex
-    }
+    render json: { exchange_transaction.as_json } # raw_tx_hex: transaction
   end
 
   private

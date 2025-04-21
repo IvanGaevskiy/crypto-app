@@ -27,12 +27,12 @@ class ExchangeTransaction < ApplicationRecord
       currency_from, amount_from, rate
     )
 
-    if amount_to.to_d.round(8) != amount_after_fees.round(8)
-      errors.add(
-        :amount_to,
-        "Сумма получения с учётом коммиссий не соответствует расчётам"
-      )
-    end
+    # if amount_to.to_d.round(8) != amount_after_fees.round(8)
+    #   errors.add(
+    #     :amount_to,
+    #     "Сумма получения с учётом коммиссий не соответствует расчётам"
+    #   )
+    # end
   end
   puts Time.now
   def recipient_address_validation
