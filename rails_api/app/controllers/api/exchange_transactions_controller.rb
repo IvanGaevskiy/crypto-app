@@ -15,9 +15,8 @@ class Api::ExchangeTransactionsController < ApplicationController
     end
 
     transaction_service = init_transaction(exchange_transaction)
-
     transaction_service.create_transaction
-    puts transaction_service.decode.to_h
+    puts transaction_service.decode
     transaction_service.broadcast_transaction
     exchange_transaction.update(status: "success")
 

@@ -27,14 +27,12 @@ class BitcoinTransactionService
     return nil if change <= 0
 
     tx = Bitcoin::Tx.new
+    tx.marker = 0
+    tx.flag = 1
     utxos.each do |utxo|
       prev_txid_bin = [utxo["txid"]].pack("H*").reverse
       out_point = Bitcoin::OutPoint.new(prev_txid_bin, utxo["vout"])
-      tx.in << Bitcoin::TxIn.new(
-        out_point: out_point,
-        script_sig: Bitcoin::Script.new,
-        sequence: 0xffffffff
-      )
+      tx.in << Bitcoin::TxIn.new(out_point: out_point)
     end
     recipient_script = Bitcoin::Script.parse_from_addr(@recipient_address)
     tx.out << Bitcoin::TxOut.new(value: @amount_to, script_pubkey: recipient_script)
@@ -42,26 +40,16 @@ class BitcoinTransactionService
 
     tx.out << Bitcoin::TxOut.new(value: change, script_pubkey: exchange_script) if change > 0
 
-    utxos.each_with_index do |_utxo, index|
-      # Для P2PKH скрипт из публичного ключа отправителя
-      utxo_script = Bitcoin::Script.to_p2pkh(EXCHANGE_PUB_KEY.htb)
-
-      # Вычисляем sighash для входа
-      sig_hash = tx.sighash_for_input(index, utxo_script)
-
-      # Подписываем sighash приватным ключом
+    utxos.each_with_index do |utxo, i|
+      utxo_script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADDRESS)
+      tx.sighash_for_input(i, utxo_script)
+      sig_hash = tx.sighash_for_input(i, utxo_script, opts: { amount: utxo["value"] })
       signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
-
-      # Формируем scriptSig: push(signature) + push(pubkey)
-      script_sig = Bitcoin::Script.new << signature << EXCHANGE_PUB_KEY.htb
-
-      # Получаем сериализованную транзакцию в hex
-      tx.in[index].script_sig = script_sig
+      tx.in[i].script_sig = Bitcoin::Script.new
+      tx.in[i].script_witness = Bitcoin::ScriptWitness.new([signature, EXCHANGE_PUB_KEY.htb])
     end
 
     @raw_tx_hex = tx.to_payload.bth
-
-    @raw_tx_hex
   end
 
   def broadcast_transaction
@@ -77,7 +65,7 @@ class BitcoinTransactionService
   end
 
   def decode
-    Bitcoin::Tx.parse_from_payload(@raw_tx_hex.htb, strict: true)
+    Bitcoin::Tx.parse_from_payload(@raw_tx_hex.htb, strict: true).to_h
   end
 
   private
