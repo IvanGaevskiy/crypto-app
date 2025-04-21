@@ -10,10 +10,10 @@ export type ResponseGetCurrencies = Record<string, { price_usd: string }>
 
 type Agreement = {
   agreement_type: 'KYC' | 'AML'
-  approved: boolean
+  approved: string
 }
 
-type RequestCreateTransaction = {
+ export type RequestCreateTransaction = {
   currency_from: string
   amount_from: string
   currency_to: string
@@ -25,7 +25,7 @@ type RequestCreateTransaction = {
   agreements: Agreement[]
 }
 
-type ResponseCreateTransaction = {
+export type ResponseCreateTransaction = {
   id: number
   currency_from: string
   amount_from: string
@@ -35,7 +35,7 @@ type ResponseCreateTransaction = {
   recorded_at: string
   recipient_address: string
   email: string
-  status: 'processing' | 'completed' | 'failed'
+  status: 'processing' | 'success' | 'failed'
   created_at: string
   updated_at: string
 }
@@ -55,7 +55,7 @@ export const createTransaction = async (
   request: RequestCreateTransaction
 ): Promise<ResponseCreateTransaction> => {
   const { data }: AxiosResponse<ResponseCreateTransaction> = await axios.post(
-    `${SERVER_HOST}/create`,
+    `${SERVER_HOST}/api/create`,
     request
   )
 

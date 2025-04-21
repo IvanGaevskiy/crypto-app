@@ -21,7 +21,7 @@ import {
   isValidKYCAndAML,
   isValidPurposePay
 } from '../../validations'
-import { getCurrencies } from './ExchangeRequests'
+import { createTransaction, getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
 
 import { Decimal } from 'decimal.js'
@@ -49,10 +49,35 @@ export const ExchangePage = () => {
   const [isKYC, setIsKYC] = useState(true)
   const [isAML, setIsAML] = useState(true)
   const [isEmpty, setIsEmpty] = useState<Record<string, boolean>>({})
+  const [isSubmit, setIsSubmit] = useState(false)
   const { push } = useRouter()
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
+
+  const sendTransaction = async () => {
+    try {
+      const response = await createTransaction({
+        currency_from: currFrom,
+        amount_from: amountFrom,
+        currency_to: currTo,
+        amount_to: amountTo,
+        rate: courseFrom,
+        recorded_at: new Date().toISOString(),
+        recipient_address: purposePay,
+        email: email,
+        agreements: [
+          { agreement_type: 'KYC', approved: isKYC.toString() },
+          { agreement_type: 'AML', approved: isAML.toString() }
+        ]
+      })
+      push('/completed_transaction', response)
+    } catch (error) {
+      push('/404')
+    } finally {
+      setIsSubmit(false)
+    }
+  }
 
   const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
@@ -72,8 +97,7 @@ export const ExchangePage = () => {
 
     if (!hasErrors) {
       console.log('Все валидации пройдены успешно!')
-      // тут будет отдельный метод отправки запроса на бэк
-      push('/completed_transaction')
+      setIsSubmit(true)
     } else {
       console.log('Некоторые валидации не пройдены :(')
 
@@ -269,6 +293,11 @@ export const ExchangePage = () => {
     amountConvertTo()
   }, [amountFrom, isShowFee])
 
+  useEffect(() => {
+    if (!isSubmit) return
+    sendTransaction()
+  }, [isSubmit])
+
   return (
     <div className="flex flex-col">
       <div className="flex gap-4">
@@ -455,4 +484,17 @@ export const ExchangePage = () => {
       />
     </div>
   )
+}
+function broadcastTransaction(arg0: {
+  currency_from: string
+  amount_from: string
+  currency_to: string
+  amount_to: string
+  rate: string
+  recorded_at: string
+  recipient_address: string
+  email: string
+  agreements: { agreement_type: string; approved: string }[]
+}) {
+  throw new Error('Function not implemented.')
 }
