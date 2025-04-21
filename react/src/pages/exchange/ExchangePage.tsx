@@ -7,6 +7,7 @@ import { Checkbox } from '../../components/Checkbox'
 import { CurrencyPopover } from '../../components/CurrencyPopover'
 import { CurrencyRateInfo } from '../../components/CurrencyRateInfo'
 import { Input } from '../../components/Input'
+import { Loader } from '../../components/Loader'
 import { MinMaxContainer } from '../../components/MinMaxContainer'
 import { MiniButton } from '../../components/MiniButton'
 import { ReverseButton } from '../../components/ReverseButton'
@@ -473,7 +474,13 @@ export const ExchangePage = () => {
           </div>
         </div>
         <Button onClick={startExchangeSubmit} type="submit" className="!h-9 text-sm">
-          Начать обмен
+          {isSubmit && (
+            <div className="flex items-center justify-center gap-0.5">
+              <Loader></Loader>
+              <span>Загрузка</span>
+            </div>
+          )}
+          {!isSubmit && <span>Начать обмен</span>}
         </Button>
       </div>
       <ValidationInput
@@ -484,17 +491,4 @@ export const ExchangePage = () => {
       />
     </div>
   )
-}
-function broadcastTransaction(arg0: {
-  currency_from: string
-  amount_from: string
-  currency_to: string
-  amount_to: string
-  rate: string
-  recorded_at: string
-  recipient_address: string
-  email: string
-  agreements: { agreement_type: string; approved: string }[]
-}) {
-  throw new Error('Function not implemented.')
 }
