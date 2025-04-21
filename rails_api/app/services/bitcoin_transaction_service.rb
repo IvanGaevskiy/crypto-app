@@ -4,12 +4,13 @@ require "bitcoin"
 Bitcoin.chain_params = BITCOIN_NETWORK
 
 class BitcoinTransactionService
-  EXCHANGE_ADRESS = ENV.fetch("EXCHANGE_ADRESS")
+  EXCHANGE_ADDRESS = ENV.fetch("EXCHANGE_ADDRESS")
   EXCHANGE_PRIVATE_KEY = ENV.fetch("EXCHANGE_PRIVATE_KEY")
+  EXCHANGE_PUB_KEY = ENV.fetch("EXCHANGE_PUB_KEY")
 
   def initialize(recipient_address, amount_to)
     @recipient_address = recipient_address
-    @key = Bitcoin::Key.from_base58(EXCHANGE_PRIVATE_KEY)
+    @key = Bitcoin::Key.from_wif(EXCHANGE_PRIVATE_KEY)
     @amount_to = to_satoshi(amount_to)
     @raw_tx_hex = ""
   end
@@ -26,25 +27,35 @@ class BitcoinTransactionService
     return nil if change <= 0
 
     tx = Bitcoin::Tx.new
-
     utxos.each do |utxo|
-      tx.add_in(
-        Bitcoin::TxIn.new(
-          prev_out: [utxo["txid"]].pack("H*").reverse + [utxo["vout"]].pack("V"),
-          script_sig: "",
-          sequence: "\xff\xff\xff\xff"
-        )
+      prev_txid_bin = [utxo["txid"]].pack("H*").reverse
+      out_point = Bitcoin::OutPoint.new(prev_txid_bin, utxo["vout"])
+      tx.in << Bitcoin::TxIn.new(
+        out_point: out_point,
+        script_sig: Bitcoin::Script.new,
+        sequence: 0xffffffff
       )
     end
+    recipient_script = Bitcoin::Script.parse_from_addr(@recipient_address)
+    tx.out << Bitcoin::TxOut.new(value: @amount_to, script_pubkey: recipient_script)
+    exchange_script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADDRESS)
 
-    tx.add_out(Bitcoin::TxOut.value_to_address(@amount_to, @recipient_address))
-    tx.add_out(Bitcoin::TxOut.value_to_address(change, EXCHANGE_ADRESS)) if change > 0
+    tx.out << Bitcoin::TxOut.new(value: change, script_pubkey: exchange_script) if change > 0
 
     utxos.each_with_index do |_utxo, index|
-      script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADRESS)
-      sig_hash = tx.sighash_for_input(index, script)
+      # Для P2PKH скрипт из публичного ключа отправителя
+      utxo_script = Bitcoin::Script.to_p2pkh(EXCHANGE_PUB_KEY.htb)
+
+      # Вычисляем sighash для входа
+      sig_hash = tx.sighash_for_input(index, utxo_script)
+
+      # Подписываем sighash приватным ключом
       signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
-      script_sig = Bitcoin::Script.to_p2pkh_sig_script(signature, EXCHANGE_PUB_KEY.htb)
+
+      # Формируем scriptSig: push(signature) + push(pubkey)
+      script_sig = Bitcoin::Script.new << signature << EXCHANGE_PUB_KEY.htb
+
+      # Получаем сериализованную транзакцию в hex
       tx.in[index].script_sig = script_sig
     end
 
@@ -65,14 +76,16 @@ class BitcoinTransactionService
     response.body # txid
   end
 
+  def decode
+    Bitcoin::Tx.parse_from_payload(@raw_tx_hex.htb, strict: true)
+  end
+
   private
 
   def fetch_utxos
-    mempool_api = ENV.fetch("MEMPOOL_API")
+    response = Faraday.get("#{MEMPOOL_API}/address/#{EXCHANGE_ADDRESS}/utxo")
 
-    response = Faraday.get("#{mempool_api}/address/#{EXCHANGE_ADRESS}/utxo")
-
-    raise "Ошибка в запросе UTXO: #{response.status} #{response.body}" unless response.success
+    raise "Ошибка в запросе UTXO: #{response.status} #{response.body}" if !response.success?
 
     Rails.logger.info("UTXOS успешно получены: #{response.body}")
     JSON.parse(response.body)

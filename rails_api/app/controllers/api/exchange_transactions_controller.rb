@@ -14,29 +14,18 @@ class Api::ExchangeTransactionsController < ApplicationController
       }, status: :unprocessable_entity
     end
 
-    begin
-      # transaction_service = init_transaction(exchange_transaction)
-      # raw_tx_hex = transaction_service.create_transaction
+    transaction_service = init_transaction(exchange_transaction)
 
-      # decoded_hex = BlockcypherService.new(raw_tx_hex).decode
-      # Rails.logger.info decoded_hex
+    transaction_service.create_transaction
+    puts transaction_service.decode.to_h
+    transaction_service.broadcast_transaction
+    exchange_transaction.update(status: "success")
 
-      # transaction_service.broadcast_transaction
-      raise "ERROR POINT SUCCESFULL!!!"
-      exchange_transaction.update(status: "success")
-
-      render json: {
-        status: "success",
-        transaction: exchange_transaction.as_json,
-        raw_tx_hex: raw_tx_hex
-      }
-    rescue StandardError => e
-      exchange_transaction.update(status: "failed")
-      render json: {
-        status: "error",
-        message: "Ошибка при сборке транзакции: #{e.message}"
-      }, status: :unprocessable_entity
-    end
+    render json: {
+      status: "success",
+      transaction: exchange_transaction.as_json,
+      raw_tx_hex: raw_tx_hex
+    }
   end
 
   private
