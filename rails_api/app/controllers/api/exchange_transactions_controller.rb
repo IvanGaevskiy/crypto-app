@@ -16,7 +16,8 @@ class Api::ExchangeTransactionsController < ApplicationController
 
     transaction_service = init_transaction(exchange_transaction)
     transaction_service.create_transaction
-    transaction_service.decode
+    puts "transaction_service.decode"
+    puts transaction_service.decode
     puts "exchange_transaction.as_json"
     puts exchange_transaction.as_json
     transaction_service.broadcast_transaction
