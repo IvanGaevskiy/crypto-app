@@ -6,9 +6,10 @@ type InfoItemProps = HTMLProps<HTMLDivElement> & {
   title: string
   description: string
   status?: string
+  breakAll?: boolean
 }
 
-export const InfoItem = ({ title, description, status }: InfoItemProps) => {
+export const InfoItem = ({ title, breakAll=false, description, status }: InfoItemProps) => {
   return (
     <div
       className={clsx(
@@ -17,7 +18,7 @@ export const InfoItem = ({ title, description, status }: InfoItemProps) => {
       )}
     >
       <div className={clsx('text-[16px] text-gray-500')}>{title}</div>
-      <div className={clsx('text-sm text-gray-200')}>{description}</div>
+      <div className={clsx('text-sm text-gray-200', breakAll && 'break-all')}>{description}</div>
       {status && <div className={clsx('text-xs font-bold text-green-800')}>{status}</div>}
     </div>
   )

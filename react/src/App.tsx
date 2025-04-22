@@ -11,11 +11,11 @@ export const App = () => {
     <div className="mt-12 flex min-h-[100dvh] w-full items-baseline justify-center">
       <div className="absolute top-0 z-0 h-[120%] w-full overflow-hidden">
         <img
-          className="absolute bottom-1/12 block h-auto w-full transform [-translate-x:50%] [translate-y:16%] max-sm:bottom-180 max-lg:bottom-180"
+          className="absolute bottom-0 block h-auto w-full transform [-translate-x:50%] [translate-y:16%] lg:bottom-160 max-sm:bottom-180 max-lg:bottom-180"
           src="./src/assets/space.svg"
         ></img>
         <img
-          className="absolute bottom-0 block h-auto w-full transform [-translate-x:50%] [translate-y:16%] max-sm:bottom-170 max-lg:bottom-150"
+          className="absolute bottom-0 block h-auto w-full transform [-translate-x:50%] [translate-y:16%] lg:bottom-120 max-sm:bottom-170 max-lg:bottom-150"
           src="./src/assets/planets.svg"
         ></img>
       </div>

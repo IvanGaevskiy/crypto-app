@@ -29,6 +29,7 @@ export const CompletedTransactionPage = () => {
       <InfoItem
         title="Назначение платежа"
         description={recipientAddress}
+        breakAll
       ></InfoItem>
       <InfoItem title="Обменный курс" description={`1 ${currencyFrom} = ${rate} ${currencyTo}`}></InfoItem>
     </InfoCard>
