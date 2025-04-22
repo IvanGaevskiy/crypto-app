@@ -1,9 +1,9 @@
 require "json"
 require "bitcoin"
 
-Bitcoin.chain_params = BITCOIN_NETWORK
-
 class BitcoinTransactionService
+  Bitcoin.chain_params = BITCOIN_NETWORK
+
   EXCHANGE_ADDRESS = ENV.fetch("EXCHANGE_ADDRESS")
   EXCHANGE_PRIVATE_KEY = ENV.fetch("EXCHANGE_PRIVATE_KEY")
   EXCHANGE_PUB_KEY = ENV.fetch("EXCHANGE_PUB_KEY")
@@ -23,31 +23,16 @@ class BitcoinTransactionService
     fee = estimate_tx_fee(utxos.count)
     return nil if total_input < @amount_to + fee
 
-    change = total_input - @amount_to - fee
+    change = calculate_change(total_input, fee)
     return nil if change <= 0
 
     tx = Bitcoin::Tx.new
     tx.marker = 0
     tx.flag = 1
-    utxos.each do |utxo|
-      prev_txid_bin = [utxo["txid"]].pack("H*").reverse
-      out_point = Bitcoin::OutPoint.new(prev_txid_bin, utxo["vout"])
-      tx.in << Bitcoin::TxIn.new(out_point: out_point)
-    end
-    recipient_script = Bitcoin::Script.parse_from_addr(@recipient_address)
-    tx.out << Bitcoin::TxOut.new(value: @amount_to, script_pubkey: recipient_script)
-    exchange_script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADDRESS)
 
-    tx.out << Bitcoin::TxOut.new(value: change, script_pubkey: exchange_script) if change > 0
-
-    utxos.each_with_index do |utxo, i|
-      utxo_script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADDRESS)
-      tx.sighash_for_input(i, utxo_script)
-      sig_hash = tx.sighash_for_input(i, utxo_script, opts: { amount: utxo["value"] })
-      signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
-      tx.in[i].script_sig = Bitcoin::Script.new
-      tx.in[i].script_witness = Bitcoin::ScriptWitness.new([signature, EXCHANGE_PUB_KEY.htb])
-    end
+    add_inputs_to_tx(tx, utxos)
+    add_outputs_to_tx(tx, change)
+    sign_transaction(tx, utxos)
 
     @raw_tx_hex = tx.to_payload.bth
   end
@@ -58,7 +43,7 @@ class BitcoinTransactionService
       request.body = @raw_tx_hex
     end
 
-    raise "Ошибка при бродкасте транзакции: #{response.status} — #{response.body}" unless response.success?
+    raise "Ошибка при бродкасте транзакции: #{response.body}" if !response.success?
 
     Rails.logger.info("Транзакция отправлена! TXID: #{response.body}")
     response.body # txid
@@ -69,6 +54,44 @@ class BitcoinTransactionService
   end
 
   private
+
+  def calculate_change(total_input, fee)
+    total_input - @amount_to - fee
+  end
+
+  def add_inputs_to_tx(tx, utxos)
+    utxos.each do |utxo|
+      prev_txid_bin = utxo["txid"].htb.reverse
+      out_point = Bitcoin::OutPoint.new(prev_txid_bin, utxo["vout"])
+      tx.in << Bitcoin::TxIn.new(out_point: out_point)
+    end
+  end
+
+  def add_outputs_to_tx(tx, change)
+    recipient_script = Bitcoin::Script.parse_from_addr(@recipient_address)
+    tx.out << Bitcoin::TxOut.new(value: @amount_to, script_pubkey: recipient_script)
+
+    if change > 0
+      exchange_script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADDRESS)
+      tx.out << Bitcoin::TxOut.new(value: change, script_pubkey: exchange_script)
+    end
+  end
+
+  def sign_transaction(tx, utxos)
+    utxos.each_with_index do |utxo, i|
+      utxo_script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADDRESS)
+
+      sig_hash = tx.sighash_for_input(i, utxo_script, opts: { amount: utxo["value"] })
+      signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
+
+      script_sig = Bitcoin::Script.new
+      script_sig << signature
+      script_sig << EXCHANGE_PUB_KEY.htb
+
+      tx.in[i].script_sig = script_sig
+      tx.in[i].script_witness = Bitcoin::ScriptWitness.new([signature, EXCHANGE_PUB_KEY.htb])
+    end
+  end
 
   def fetch_utxos
     response = Faraday.get("#{MEMPOOL_API}/address/#{EXCHANGE_ADDRESS}/utxo")

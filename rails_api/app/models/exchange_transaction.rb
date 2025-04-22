@@ -23,11 +23,17 @@ class ExchangeTransaction < ApplicationRecord
     return if amount_from.blank? || currency_from.blank? || rate.blank?
     return errors.add(:amount_to, "Поле пустое") if amount_to.blank?
 
-    amount_after_fees = ExchangeCalculationService.get_amount_after_fees(
+    amount_from_after_fees = ExchangeCalculationService.get_amount_after_fees(
       currency_from, amount_from, rate
     )
 
-    # if amount_to.to_d.round(8) != amount_after_fees.round(8)
+    puts "---------VALIDATION VALIDATION---------"
+    puts "amount_to.to_d.round(8)"
+    puts amount_to.to_d.round(8)
+    puts "amount_after_fees.round(8)"
+    puts amount_from_after_fees.round(8)
+
+    # if amount_to.to_d.round(8) != amount_from_after_fees.round(8)
     #   errors.add(
     #     :amount_to,
     #     "Сумма получения с учётом коммиссий не соответствует расчётам"
