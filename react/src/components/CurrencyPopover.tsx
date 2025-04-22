@@ -60,7 +60,7 @@ export const CurrencyPopover = ({
       <PopoverPanel
         className={clsx(
           'absolute top-6 flex w-full flex-col rounded-lg',
-          'bg-[#21284b] shadow-lg',
+          'bg-[#21284b] shadow-lg z-20',
           currColor
         )}
       >

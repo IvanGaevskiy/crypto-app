@@ -300,9 +300,9 @@ export const ExchangePage = () => {
   }, [isSubmit])
 
   return (
-    <div className="flex flex-col">
-      <div className="flex gap-4">
-        <div className="flex flex-col">
+    <div className="flex flex-col max-sm:p-4">
+      <div className="flex gap-4 max-sm:flex-col max-sm:gap-0 max-sm:items-baseline">
+        <div className="flex flex-col max-sm:w-full">
           <div className="relative">
             <div className={clsx('flex flex-col space-y-1', currColorFrom)}>
               <div className="flex justify-between px-4 text-sm">
@@ -311,7 +311,7 @@ export const ExchangePage = () => {
               </div>
               <Input
                 className={clsx(
-                  'peer h-10 w-70 !bg-[#000000b0] pr-32 text-sm',
+                  'peer h-10 w-70 !bg-[#000000b0] pr-32 text-sm max-sm:w-full',
                   currBorderFrom,
                   currColorFrom
                 )}
@@ -355,15 +355,15 @@ export const ExchangePage = () => {
             </div>
           </div>
         </div>
-        <div className="mb-8 flex flex-col justify-center">
+        <div className="mb-8 flex flex-col justify-center max-sm:self-end max-sm:-mt-8 max-sm:mb-0 z-20 max-sm:mr-8">
           <ReverseButton
             colorLeft={currColorTo}
             colorRight={currColorFrom}
             onClick={currencyReverse}
           />
         </div>
-        <div className="flex flex-col">
-          <div className="relative">
+        <div className="flex flex-col max-sm:w-full">
+          <div className="relative max-sm:w-full">
             <div className={clsx('flex flex-col space-y-1', currColorTo)}>
               <div className="flex justify-between px-4 text-sm">
                 <label className="cursor-default">Получаете</label>
@@ -371,7 +371,7 @@ export const ExchangePage = () => {
               </div>
               <Input
                 className={clsx(
-                  'peer h-10 w-70 !bg-[#000000b0] pr-32 text-sm',
+                  'peer h-10 w-70 !bg-[#000000b0] pr-32 text-sm max-sm:w-full',
                   currBorderTo,
                   currColorTo
                 )}
@@ -441,7 +441,7 @@ export const ExchangePage = () => {
       </div>
       <div className="mt-1 mb-1 border-b-1 border-b-[#ffffff81]" />
       <div className={clsx('flex justify-between', 'gap-4 rounded-md')}>
-        <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none')}>
+        <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none whitespace-nowrap')}>
           <div>{`Комиссия обменника ${exhangerFee} ${currTo}`}</div>
           <div>{`Комиссия майнеров ${mainersFee} ${currTo}`}</div>
         </div>
@@ -454,7 +454,7 @@ export const ExchangePage = () => {
         />
       </div>
       <div className="mt-1 mb-1 border-b-1 border-b-[#ffffff81]" />
-      <div className="flex justify-between">
+      <div className="flex justify-between max-sm:flex-col max-sm:gap-2">
         <div>
           <div className="flex flex-col items-start gap-1">
             <Checkbox

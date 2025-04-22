@@ -20,7 +20,7 @@ class Api::ExchangeTransactionsController < ApplicationController
     puts transaction_service.decode
     puts "exchange_transaction.as_json"
     puts exchange_transaction.as_json
-    transaction_service.broadcast_transaction
+    # transaction_service.broadcast_transaction
     exchange_transaction.update(status: "success")
 
     render json: exchange_transaction.as_json # raw_tx_hex: transaction
