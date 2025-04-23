@@ -28,10 +28,11 @@ import {
 } from '../../validations'
 import { getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
+import { useCurrencyReverse } from './useCurrencyReverse'
+import { useSendTransaction } from './useSendTransaction'
+import { useStartExchangeSubmit } from './useStartExchangeSubmit'
 
 import { Decimal } from 'decimal.js'
-import { useStartExchangeSubmit } from './useStartExchangeSubmit'
-import { useSendTransaction } from './useSendTransaction'
 
 export const ExchangePage = () => {
   const { currencyFrom, setCurrencyFrom } = useGlobalStore()
@@ -62,26 +63,18 @@ export const ExchangePage = () => {
 
   const { isSubmit } = useGlobalStore()
 
-  const [isReversing, setIsReversing] = useState(false)
+  const { isReversing } = useGlobalStore()
+
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
   const [isShowFee, setIsShowFee] = useState(true)
-
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
 
   const startExchangeSubmit = useStartExchangeSubmit()
   const sendTransaction = useSendTransaction()
-  
-  const currencyReverse = () => {
-    setIsReversing(true)
-    setCurrencyFrom(currencyTo)
-    setCurrencyTo(currencyFrom)
-    setTimeout(() => {
-      setIsReversing(false)
-    }, 0)
-  }
+  const currencyReverse = useCurrencyReverse()
 
   const getPriceUSD = (curr: string, dataCurrAPI: ResponseGetCurrencies) => {
     if (dataCurrAPI?.[curr]) {

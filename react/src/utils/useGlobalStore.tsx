@@ -23,6 +23,7 @@ type State = {
   isKYC: boolean
   isAML: boolean
   isSubmit: boolean
+  isReversing: boolean
 }
 
 type Setters<T> = {
@@ -49,7 +50,8 @@ export const useGlobalStore = create<State & Setters<State>>((set) => {
     isEmpty: {},
     isKYC: true,
     isAML: true,
-    isSubmit: false
+    isSubmit: false,
+    isReversing: false
   }
 
   const setters = Object.fromEntries(
