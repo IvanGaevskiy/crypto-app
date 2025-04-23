@@ -1,4 +1,4 @@
-import { useGlobalStore } from '../components/useGlobalStore'
+import { useGlobalStore } from './useGlobalStore'
 
 export const onInputChange = (
   setFunc: (value: string) => void,

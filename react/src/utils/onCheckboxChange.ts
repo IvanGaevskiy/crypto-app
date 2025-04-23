@@ -1,4 +1,4 @@
-import { useGlobalStore } from '../components/useGlobalStore'
+import { useGlobalStore } from './useGlobalStore'
 
 export const onCheckboxChange = (setFunc: (value: boolean) => void, key?: string) => {
   const { isEmpty, setIsEmpty } = useGlobalStore()

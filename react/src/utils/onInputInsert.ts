@@ -1,4 +1,4 @@
-import { useGlobalStore } from '../components/useGlobalStore'
+import { useGlobalStore } from './useGlobalStore'
 
 export const onInputInsert = (setFunc: () => void, key: string) => {
   const { isEmpty, setIsEmpty } = useGlobalStore()

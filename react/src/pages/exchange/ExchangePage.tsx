@@ -12,10 +12,12 @@ import { MinMaxContainer } from '../../components/MinMaxContainer'
 import { MiniButton } from '../../components/MiniButton'
 import { ReverseButton } from '../../components/ReverseButton'
 import { ValidationInput } from '../../components/ValidationInput'
-import { useGlobalStore } from '../../components/useGlobalStore'
 import { EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
 import { numCut } from '../../utils/numCut'
-import { useRouter } from '../../utils/userouter'
+import { onCheckboxChange } from '../../utils/onCheckboxChange'
+import { onInputChange } from '../../utils/onInputChange'
+import { onInputInsert } from '../../utils/onInputInsert'
+import { useGlobalStore } from '../../utils/useGlobalStore'
 import {
   isValidAmountFrom,
   isValidAmountTo,
@@ -24,13 +26,12 @@ import {
   isValidPurposePay,
   isValidUSDTToBTC
 } from '../../validations'
-import { createTransaction, getCurrencies } from './ExchangeRequests'
+import { getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
 
 import { Decimal } from 'decimal.js'
-import { onInputChange } from '../../utils/onInputChange'
-import { onCheckboxChange } from '../../utils/onCheckboxChange'
-import { onInputInsert } from '../../utils/onInputInsert'
+import { useStartExchangeSubmit } from './useStartExchangeSubmit'
+import { useSendTransaction } from './useSendTransaction'
 
 export const ExchangePage = () => {
   const { currencyFrom, setCurrencyFrom } = useGlobalStore()
@@ -54,79 +55,25 @@ export const ExchangePage = () => {
 
   const { exhangerFee, setExhangerFee } = useGlobalStore()
   const { mainersFee, setMainersFee } = useGlobalStore()
-  const { isEmpty, setIsEmpty } = useGlobalStore()
+  const { isEmpty } = useGlobalStore()
+
+  const { isKYC, setIsKYC } = useGlobalStore()
+  const { isAML, setIsAML } = useGlobalStore()
+
+  const { isSubmit } = useGlobalStore()
 
   const [isReversing, setIsReversing] = useState(false)
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
   const [isShowFee, setIsShowFee] = useState(true)
-  const [isKYC, setIsKYC] = useState(true)
-  const [isAML, setIsAML] = useState(true)
-  const [isSubmit, setIsSubmit] = useState(false)
-  const { push } = useRouter()
+
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
 
-  const sendTransaction = async () => {
-    try {
-      const response = await createTransaction({
-        currency_from: currFrom,
-        amount_from: amountFrom,
-        currency_to: currTo,
-        amount_to: amountTo,
-        rate: courseFrom,
-        recorded_at: new Date().toISOString(),
-        recipient_address: purposePay,
-        email: email,
-        agreements: [
-          { agreement_type: 'KYC', approved: isKYC.toString() },
-          { agreement_type: 'AML', approved: isAML.toString() }
-        ]
-      })
-      push('/completed_transaction', response)
-    } catch (error) {
-      push('/404')
-    } finally {
-      setIsSubmit(false)
-    }
-  }
-
-  const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    console.log('Начинаем валидацию...')
-    console.log('currFrom', currFrom)
-    console.log('amountFrom', amountFrom)
-    console.log('amountTo', amountTo)
-
-    const validations = {
-      amountFrom: isValidAmountFrom(amountFrom, minFrom, maxFrom),
-      amountTo: isValidAmountTo(amountTo, minTo, maxTo),
-      purposePay: isValidPurposePay(purposePay),
-      email: isValidEmail(email),
-      kycAndAml: isValidKYCAndAML([isKYC, isAML]),
-      usdtToBtc: isValidUSDTToBTC(currFrom, currTo)
-    }
-
-    console.log('Результаты валидации:', validations)
-
-    const hasErrors = Object.values(validations).some((error) => typeof error === 'string')
-
-    if (!hasErrors) {
-      console.log('Все валидации пройдены успешно!')
-      setIsSubmit(true)
-    } else {
-      console.log('Некоторые валидации не пройдены :')
-
-      const newEmptyState: Record<string, boolean> = {}
-      for (const [key, isError] of Object.entries(validations)) {
-        if (isError) newEmptyState[key] = false
-      }
-
-      setIsEmpty({ ...isEmpty, ...newEmptyState })
-    }
-  }
-
+  const startExchangeSubmit = useStartExchangeSubmit()
+  const sendTransaction = useSendTransaction()
+  
   const currencyReverse = () => {
     setIsReversing(true)
     setCurrencyFrom(currencyTo)
