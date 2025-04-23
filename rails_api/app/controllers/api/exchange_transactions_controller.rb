@@ -8,6 +8,7 @@ class Api::ExchangeTransactionsController < ApplicationController
     end
 
     if !exchange_transaction.persisted?
+      exchange_transaction.update(status: "failed")
       render json: {
         status: "error",
         errors: "Ошибка входных данных: #{exchange_transaction.errors.full_messages}"
@@ -16,14 +17,20 @@ class Api::ExchangeTransactionsController < ApplicationController
 
     transaction_service = init_transaction(exchange_transaction)
     transaction_service.create_transaction
-    puts "transaction_service.decode"
-    puts transaction_service.decode
-    # puts "exchange_transaction.as_json"
-    # puts exchange_transaction.as_json
-    transaction_service.broadcast_transaction
-    exchange_transaction.update(status: "success")
 
-    render json: exchange_transaction.as_json # raw_tx_hex: transaction
+    # p "-----transaction_service.decode: #{transaction_service.decode}"
+    # p "-----exchange_transaction.as_json {exchange_transaction.as_json}"
+
+    if !transaction_service.broadcast_transaction
+      exchange_transaction.update(status: "failed")
+      render json: {
+        status: "error",
+        errors: "Ошибка при бродкасте транзакции"
+      }, status: :unprocessable_entity
+    end
+
+    exchange_transaction.update(status: "success")
+    render json: exchange_transaction.as_json
   end
 
   private

@@ -5,12 +5,10 @@ class BitcoinTransactionService
   Bitcoin.chain_params = BITCOIN_NETWORK
 
   EXCHANGE_ADDRESS = ENV.fetch("EXCHANGE_ADDRESS")
-  EXCHANGE_PRIVATE_KEY = ENV.fetch("EXCHANGE_PRIVATE_KEY")
-  EXCHANGE_PUB_KEY = ENV.fetch("EXCHANGE_PUB_KEY")
 
   def initialize(recipient_address, amount_to)
     @recipient_address = recipient_address
-    @key = Bitcoin::Key.from_wif(EXCHANGE_PRIVATE_KEY)
+    @key = Bitcoin::Key.from_wif(ENV.fetch("EXCHANGE_PRIVATE_KEY"))
     @amount_to = to_satoshi(amount_to)
     @raw_tx_hex = ""
   end
@@ -43,10 +41,12 @@ class BitcoinTransactionService
       request.body = @raw_tx_hex
     end
 
-    raise "Ошибка при бродкасте транзакции: #{response.body}" if !response.success?
+    if !response.success?
+      Rails.logger.error("Ошибка при бродкасте транзакции: #{response.body}")
+      return nil
+    end
 
-    Rails.logger.info("Транзакция отправлена! TXID: #{response.body}")
-    response.body # txid
+    true
   end
 
   def decode
@@ -84,16 +84,14 @@ class BitcoinTransactionService
       signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
 
       tx.in[i].script_witness.stack << signature
-      tx.in[i].script_witness.stack << EXCHANGE_PUB_KEY.htb
+      tx.in[i].script_witness.stack << @key.pubkey.htb
     end
   end
 
   def fetch_utxos
     response = Faraday.get("#{MEMPOOL_API}/address/#{EXCHANGE_ADDRESS}/utxo")
+    return nil if !response.success?
 
-    raise "Ошибка в запросе UTXO: #{response.status} #{response.body}" if !response.success?
-
-    Rails.logger.info("UTXOS успешно получены: #{response.body}")
     JSON.parse(response.body)
   end
 
