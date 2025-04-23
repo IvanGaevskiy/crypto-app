@@ -27,8 +27,8 @@ type Setters<T> = {
 
 export const useGlobalStore = create<State & Setters<State>>((set) => {
   const initialState: State = {
-    currencyFrom: CURRENCY_OPTIONS[0],
-    currencyTo: CURRENCY_OPTIONS[1],
+    currencyFrom: CURRENCY_OPTIONS[1],
+    currencyTo: CURRENCY_OPTIONS[0],
     amountFrom: '0',
     amountTo: '0',
     purposePay: '',
