@@ -322,11 +322,13 @@ export const ExchangePage = () => {
   useEffect(() => {
     if (isReversing || isAmountConvertFrom) return
     amountConvertTo()
+    setMaxMin(currenciesAPI)
   }, [amountFrom, isShowFee])
 
   useEffect(() => {
     if (!isSubmit) return
     sendTransaction()
+    setMaxMin(currenciesAPI)
   }, [isSubmit])
 
   return (
