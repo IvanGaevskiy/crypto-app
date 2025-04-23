@@ -94,33 +94,46 @@ export const ExchangePage = () => {
     setCourseTo(resultCourseTo.toString())
   }
 
-  const limitAfterFees = (priceBTC: Decimal, limit: string) => {
-    const exchangeFee = new Decimal(limit).times(EX_FEE)
-    const mainersFee = priceBTC.times(TX_FEE)
-    const totalFees = exchangeFee.plus(mainersFee)
-    return new Decimal(limit).minus(totalFees)
+  const limitAfterFees = (priceBTC: Decimal, limit: Decimal) => {
+    if (isShowFee) {
+      const exchangeFee = limit.times(EX_FEE)
+      const mainersFee = priceBTC.times(TX_FEE)
+      const totalFees = exchangeFee.plus(mainersFee)
+  
+      return limit.plus(totalFees)
+    }
+
+    return limit
   }
 
   const setMaxMin = (dataCurrAPI: ResponseGetCurrencies) => {
     const from = getPriceUSD(currFrom, dataCurrAPI)
     const to = getPriceUSD(currTo, dataCurrAPI)
 
+    const priceUSDT = getPriceUSD('USDT', dataCurrAPI)
+
+    const priceUSDTMin = new Decimal(MIN).times(priceUSDT)
+    const priceUSDTMax = new Decimal(MAX).times(priceUSDT)
+
+    if (currFrom === 'USDT') {
+      setMinFrom(MIN)
+      setMaxFrom(MAX)
+
+    }else {
+      const resultMinFrom = numCut(priceUSDTMin.div(from).abs())
+      const resultMaxFrom = numCut(priceUSDTMax.div(from).abs())
+  
+      setMinFrom(resultMinFrom.toString())
+      setMaxFrom(resultMaxFrom.toString())
+    }
+
     const priceBTC = getPriceUSD('BTC', dataCurrAPI)
 
-    const minAfterFees = limitAfterFees(priceBTC, MIN)
-    const maxAfterFees = limitAfterFees(priceBTC, MAX)
-
-    const min = new Decimal(MIN)
-    const max = new Decimal(MAX)
-
-    const resultMinFrom = numCut(min.div(from).abs())
-    const resultMaxFrom = numCut(max.div(from).abs())
+    const minAfterFees = limitAfterFees(priceBTC, priceUSDTMin)
+    const maxAfterFees = limitAfterFees(priceBTC, priceUSDTMax)
 
     const resultMinTo = numCut(minAfterFees.div(to).abs())
     const resultMaxTo = numCut(maxAfterFees.div(to).abs())
-
-    setMinFrom(resultMinFrom.toString())
-    setMaxFrom(resultMaxFrom.toString())
 
     setMinTo(resultMinTo.toString())
     setMaxTo(resultMaxTo.toString())
