@@ -48,4 +48,5 @@ export const MIN_GET_ERROR = `Маленькое значение (${MIN} USDT �
 export const RECIPIENT_ADDRESS_ERROR = 'Некорректный адрес (P2PKH/P2SH/P2WPKH)';
 export const EMAIL_ERROR = 'Проверьте email — есть опечатка ';
 export const KYC_AML_ERROR = 'Отметьте чекбоксы для продолжения';
+export const USTD_TO_BTC_ERROR = 'Доступен перевод только из USDT в BTC';
 export const SERVER_HOST = 'http://localhost:3000'

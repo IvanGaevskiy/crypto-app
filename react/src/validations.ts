@@ -5,7 +5,8 @@ import {
   MAX_SEND_ERROR,
   MIN_GET_ERROR,
   MIN_SEND_ERROR,
-  RECIPIENT_ADDRESS_ERROR
+  RECIPIENT_ADDRESS_ERROR,
+  USTD_TO_BTC_ERROR
 } from './constanst'
 
 import Decimal from 'decimal.js'
@@ -63,5 +64,13 @@ export const isValidKYCAndAML = (checkboxes: boolean[]): string | null => {
     return KYC_AML_ERROR
   }
 
+  return null
+}
+
+export const isValidUSDTToBTC = (currFrom: string, currTo: string): string | null => {
+  if (!(currFrom === 'USDT' && currTo === 'BTC')) {
+    return USTD_TO_BTC_ERROR
+  }
+  
   return null
 }

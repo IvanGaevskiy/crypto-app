@@ -20,7 +20,8 @@ import {
   isValidAmountTo,
   isValidEmail,
   isValidKYCAndAML,
-  isValidPurposePay
+  isValidPurposePay,
+  isValidUSDTToBTC
 } from '../../validations'
 import { createTransaction, getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
@@ -83,13 +84,17 @@ export const ExchangePage = () => {
   const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     console.log('Начинаем валидацию...')
+    console.log('currFrom', currFrom)
+    console.log('amountFrom', amountFrom)
+    console.log('amountTo', amountTo)
 
     const validations = {
       amountFrom: isValidAmountFrom(amountFrom, minFrom, maxFrom),
       amountTo: isValidAmountTo(amountTo, minTo, maxTo),
       purposePay: isValidPurposePay(purposePay),
       email: isValidEmail(email),
-      kycAndAml: isValidKYCAndAML([isKYC, isAML])
+      kycAndAml: isValidKYCAndAML([isKYC, isAML]),
+      usdtToBtc: isValidUSDTToBTC(currFrom, currTo)
     }
 
     console.log('Результаты валидации:', validations)
@@ -100,7 +105,7 @@ export const ExchangePage = () => {
       console.log('Все валидации пройдены успешно!')
       setIsSubmit(true)
     } else {
-      console.log('Некоторые валидации не пройдены :(')
+      console.log('Некоторые валидации не пройдены :')
 
       const newEmptyState: Record<string, boolean> = {}
       for (const [key, isError] of Object.entries(validations)) {
@@ -124,6 +129,18 @@ export const ExchangePage = () => {
       const isEmpty = value == '' || value == '0'
 
       setFunc(value)
+      setIsEmpty((prev) => ({ ...prev, [key]: isEmpty }))
+    }
+  }
+
+  const onInputInsert = (
+    setFunc: () => void,
+    key: string,
+  ) => {
+    return () => {
+      const isEmpty = false
+
+      setFunc()
       setIsEmpty((prev) => ({ ...prev, [key]: isEmpty }))
     }
   }
@@ -338,13 +355,13 @@ export const ExchangePage = () => {
                   className={currColorFrom}
                   text="min: "
                   value={minFrom}
-                  onMouseDown={() => setAmountFrom(String(minFrom))}
+                  onMouseDown={onInputInsert(() => setAmountFrom(minFrom), 'usdtToBtc')}
                 />
                 <MiniButton
                   className={currColorFrom}
                   text="max: "
                   value={maxFrom}
-                  onMouseDown={() => setAmountFrom(String(maxFrom))}
+                  onMouseDown={onInputInsert(() => setAmountFrom(maxFrom), 'usdtToBtc')}
                 />
               </MinMaxContainer>
 
@@ -488,10 +505,15 @@ export const ExchangePage = () => {
         </Button>
       </div>
       <ValidationInput
-        className="mt-2"
+        className="mt-2 mb-1"
         isEmpty={!isEmpty.isAML && !isEmpty.isKYC}
         validFunc={isValidKYCAndAML}
         args={[[isKYC, isAML]]}
+      />
+      <ValidationInput
+        isEmpty={isEmpty.usdtToBtc}
+        validFunc={isValidUSDTToBTC}
+        args={[currFrom, currTo]}
       />
     </div>
   )

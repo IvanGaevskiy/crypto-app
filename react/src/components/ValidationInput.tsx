@@ -13,7 +13,7 @@ export const ValidationInput = <T extends any[]>({
   className,
   isEmpty = true,
   validFunc,
-  args,
+  args
 }: ValidationInputProps<T>) => {
   const error = validFunc(...args)
 
@@ -22,10 +22,7 @@ export const ValidationInput = <T extends any[]>({
 
   return (
     <div
-      className={clsx(
-        'rounded-md text-[#ff5858ae] bg-[#23232377] py-2 px-1 text-xs',
-        className
-      )}
+      className={clsx('rounded-md bg-[#23232377] px-1 py-2 text-xs text-[#ff5858ae]', className)}
     >
       {error}
     </div>
