@@ -35,46 +35,142 @@ import { useStartExchangeSubmit } from './useStartExchangeSubmit'
 import { Decimal } from 'decimal.js'
 
 export const ExchangePage = () => {
-  const { currencyFrom, setCurrencyFrom } = useGlobalStore()
-  const { currencyTo, setCurrencyTo } = useGlobalStore()
-
-  const { amountFrom, setAmountFrom } = useGlobalStore()
-  const { amountTo, setAmountTo } = useGlobalStore()
-
-  const { purposePay, setPurposePay } = useGlobalStore()
-  const { email, setEmail } = useGlobalStore()
-
-  const { currenciesAPI, setCurrenciesAPI } = useGlobalStore()
-  const { courseFrom, setCourseFrom } = useGlobalStore()
-  const { courseTo, setCourseTo } = useGlobalStore()
-
-  const { maxFrom, setMaxFrom } = useGlobalStore()
-  const { maxTo, setMaxTo } = useGlobalStore()
-
-  const { minFrom, setMinFrom } = useGlobalStore()
-  const { minTo, setMinTo } = useGlobalStore()
-
-  const { exhangerFee, setExhangerFee } = useGlobalStore()
-  const { mainersFee, setMainersFee } = useGlobalStore()
-  const { isEmpty } = useGlobalStore()
-
-  const { isKYC, setIsKYC } = useGlobalStore()
-  const { isAML, setIsAML } = useGlobalStore()
-
-  const { isSubmit } = useGlobalStore()
-
-  const { isReversing } = useGlobalStore()
-
+  const [currencyFrom, setCurrencyFrom] = useState(CURRENCY_OPTIONS[0])
+  const [currencyTo, setCurrencyTo] = useState(CURRENCY_OPTIONS[1])
+  const [amountFrom, setAmountFrom] = useState('0')
+  const [amountTo, setAmountTo] = useState('0')
+  const [purposePay, setPurposePay] = useState('')
+  const [email, setEmail] = useState('')
+  const [currenciesAPI, setCurrenciesAPI] = useState<ResponseGetCurrencies>({})
+  const [courseFrom, setCourseFrom] = useState('0')
+  const [courseTo, setCourseTo] = useState('0')
+  const [maxFrom, setMaxFrom] = useState('0')
+  const [maxTo, setMaxTo] = useState('0')
+  const [minFrom, setMinFrom] = useState('0')
+  const [minTo, setMinTo] = useState('0')
+  const [exhangerFee, setExhangerFee] = useState('0')
+  const [mainersFee, setMainersFee] = useState('0')
+  const [isReversing, setIsReversing] = useState(false)
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
   const [isShowFee, setIsShowFee] = useState(true)
+  const [isKYC, setIsKYC] = useState(true)
+  const [isAML, setIsAML] = useState(true)
+  const [isSubmit, setIsSubmit] = useState(false)
+  const { push } = useRouter()
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
   const { curr: currTo, currColor: currColorTo, currBorder: currBorderTo } = currencyTo
 
-  const startExchangeSubmit = useStartExchangeSubmit()
-  const sendTransaction = useSendTransaction()
-  const { currencyReverse } = useCurrencyReverse()
+  const sendTransaction = async () => {
+    try {
+      const response = await createTransaction({
+        currency_from: currFrom,
+        amount_from: amountFrom,
+        currency_to: currTo,
+        amount_to: amountTo,
+        rate: courseFrom,
+        recorded_at: new Date().toISOString(),
+        recipient_address: purposePay,
+        email: email,
+        agreements: [
+          { agreement_type: 'KYC', approved: isKYC.toString() },
+          { agreement_type: 'AML', approved: isAML.toString() }
+        ]
+      })
+      push('/completed_transaction', response)
+    } catch (error) {
+      push('/404')
+    } finally {
+      setIsSubmit(false)
+    }
+  }
+
+  const startExchangeSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    console.log('Начинаем валидацию...')
+    console.log('currFrom', currFrom)
+    console.log('amountFrom', amountFrom)
+    console.log('amountTo', amountTo)
+
+    const validations = {
+      amountFrom: isValidAmountFrom(amountFrom, minFrom, maxFrom),
+      amountTo: isValidAmountTo(amountTo, minTo, maxTo),
+      purposePay: isValidPurposePay(purposePay),
+      email: isValidEmail(email),
+      kycAndAml: isValidKYCAndAML([isKYC, isAML]),
+      usdtToBtc: isValidUSDTToBTC(currFrom, currTo)
+    }
+
+    console.log('Результаты валидации:', validations)
+
+    const hasErrors = Object.values(validations).some((error) => typeof error === 'string')
+
+    if (!hasErrors) {
+      console.log('Все валидации пройдены успешно!')
+      setIsSubmit(true)
+    } else {
+      console.log('Некоторые валидации не пройдены :')
+
+      const newEmptyState: Record<string, boolean> = {}
+      for (const [key, isError] of Object.entries(validations)) {
+        if (isError) newEmptyState[key] = false
+      }
+
+      setIsEmpty({ ...isEmpty, ...newEmptyState })
+    }
+  }
+
+  const onInputChange = (
+    setFunc: (value: string) => void,
+    key: string,
+    defaultZero: boolean = false
+  ) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = defaultZero && e.target.value === '' ? '0' : e.target.value
+      const isEmp = value == '' || value == '0'
+
+      setFunc(value)
+      setIsEmpty({
+        ...isEmpty,
+        [key]: isEmp
+      })
+    }
+  }
+
+  const onInputInsert = (setFunc: () => void, key: string) => {
+    return () => {
+      const isEmp = false
+
+      setFunc()
+      setIsEmpty({
+        ...isEmpty,
+        [key]: isEmp
+      })
+    }
+  }
+
+  const onCheckboxChange = (setFunc: (value: boolean) => void, key?: string) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFunc(e.target.checked)
+      if (key) {
+        const isEmp = !e.target.checked
+        setIsEmpty({
+          ...isEmpty,
+          [key]: isEmp
+        })
+      }
+    }
+  }
+
+  const currencyReverse = () => {
+    setIsReversing(true)
+    setCurrencyFrom(currencyTo)
+    setCurrencyTo(currencyFrom)
+    setTimeout(() => {
+      setIsReversing(false)
+    }, 0)
+  }
 
   const getPriceUSD = (curr: string, dataCurrAPI: ResponseGetCurrencies) => {
     if (dataCurrAPI?.[curr]) {
