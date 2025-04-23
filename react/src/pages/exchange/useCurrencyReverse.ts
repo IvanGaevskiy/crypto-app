@@ -2,7 +2,8 @@ import { useGlobalStore } from '../../utils/useGlobalStore'
 
 export const useCurrencyReverse = () => {
   const globalStore = useGlobalStore()
-  return () => {
+
+  const currencyReverse = () => {
     const { setIsReversing } = globalStore
     const { currencyFrom, setCurrencyFrom } = globalStore
     const { currencyTo, setCurrencyTo } = globalStore
@@ -14,4 +15,6 @@ export const useCurrencyReverse = () => {
       setIsReversing(false)
     }, 0)
   }
+  
+  return { currencyReverse }
 }

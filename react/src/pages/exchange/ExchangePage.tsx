@@ -74,7 +74,7 @@ export const ExchangePage = () => {
 
   const startExchangeSubmit = useStartExchangeSubmit()
   const sendTransaction = useSendTransaction()
-  const currencyReverse = useCurrencyReverse()
+  const { currencyReverse } = useCurrencyReverse()
 
   const getPriceUSD = (curr: string, dataCurrAPI: ResponseGetCurrencies) => {
     if (dataCurrAPI?.[curr]) {
@@ -99,7 +99,7 @@ export const ExchangePage = () => {
       const exchangeFee = limit.times(EX_FEE)
       const mainersFee = priceBTC.times(TX_FEE)
       const totalFees = exchangeFee.plus(mainersFee)
-  
+
       return limit.plus(totalFees)
     }
 
@@ -118,11 +118,10 @@ export const ExchangePage = () => {
     if (currFrom === 'USDT') {
       setMinFrom(MIN)
       setMaxFrom(MAX)
-
-    }else {
+    } else {
       const resultMinFrom = numCut(priceUSDTMin.div(from).abs())
       const resultMaxFrom = numCut(priceUSDTMax.div(from).abs())
-  
+
       setMinFrom(resultMinFrom.toString())
       setMaxFrom(resultMaxFrom.toString())
     }
