@@ -301,7 +301,7 @@ export const ExchangePage = () => {
 
   return (
     <div className="flex flex-col max-sm:p-4">
-      <div className="flex gap-4 max-sm:flex-col max-sm:gap-0 max-sm:items-baseline">
+      <div className="flex gap-4 max-sm:flex-col max-sm:items-baseline max-sm:gap-0">
         <div className="flex flex-col max-sm:w-full">
           <div className="relative">
             <div className={clsx('flex flex-col space-y-1', currColorFrom)}>
@@ -355,7 +355,7 @@ export const ExchangePage = () => {
             </div>
           </div>
         </div>
-        <div className="mb-8 flex flex-col justify-center max-sm:self-end max-sm:-mt-8 max-sm:mb-0 z-20 max-sm:mr-8">
+        <div className="z-20 mb-8 flex flex-col justify-center max-sm:-mt-8 max-sm:mr-8 max-sm:mb-0 max-sm:self-end">
           <ReverseButton
             colorLeft={currColorTo}
             colorRight={currColorFrom}
@@ -441,7 +441,11 @@ export const ExchangePage = () => {
       </div>
       <div className="mt-1 mb-1 border-b-1 border-b-[#ffffff81]" />
       <div className={clsx('flex justify-between', 'gap-4 rounded-md')}>
-        <div className={clsx('flex flex-col items-baseline text-xs text-gray-400 select-none whitespace-nowrap')}>
+        <div
+          className={clsx(
+            'flex flex-col items-baseline text-xs whitespace-nowrap text-gray-400 select-none'
+          )}
+        >
           <div>{`Комиссия обменника ${exhangerFee} ${currTo}`}</div>
           <div>{`Комиссия майнеров ${mainersFee} ${currTo}`}</div>
         </div>

@@ -61,8 +61,7 @@ class BitcoinTransactionService
 
   def add_inputs_to_tx(tx, utxos)
     utxos.each do |utxo|
-      prev_txid_bin = utxo["txid"].htb.reverse
-      out_point = Bitcoin::OutPoint.new(prev_txid_bin, utxo["vout"])
+      out_point = Bitcoin::OutPoint.from_txid(utxo["txid"], utxo["vout"])
       tx.in << Bitcoin::TxIn.new(out_point: out_point)
     end
   end
@@ -79,17 +78,13 @@ class BitcoinTransactionService
 
   def sign_transaction(tx, utxos)
     utxos.each_with_index do |utxo, i|
-      utxo_script = Bitcoin::Script.parse_from_addr(EXCHANGE_ADDRESS)
+      utxo_script = Bitcoin::Script.to_p2pkh(@key.hash160)
 
-      sig_hash = tx.sighash_for_input(i, utxo_script, opts: { amount: utxo["value"] })
+      sig_hash = tx.sighash_for_input(i, utxo_script, sig_version: :witness_v0, amount: utxo["value"])
       signature = @key.sign(sig_hash) + [Bitcoin::SIGHASH_TYPE[:all]].pack("C")
 
-      script_sig = Bitcoin::Script.new
-      script_sig << signature
-      script_sig << EXCHANGE_PUB_KEY.htb
-
-      tx.in[i].script_sig = script_sig
-      tx.in[i].script_witness = Bitcoin::ScriptWitness.new([signature, EXCHANGE_PUB_KEY.htb])
+      tx.in[i].script_witness.stack << signature
+      tx.in[i].script_witness.stack << EXCHANGE_PUB_KEY.htb
     end
   end
 
