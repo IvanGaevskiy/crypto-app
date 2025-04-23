@@ -12,7 +12,8 @@ import { MinMaxContainer } from '../../components/MinMaxContainer'
 import { MiniButton } from '../../components/MiniButton'
 import { ReverseButton } from '../../components/ReverseButton'
 import { ValidationInput } from '../../components/ValidationInput'
-import { CURRENCY_OPTIONS, EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
+import { useGlobalStore } from '../../components/useGlobalStore'
+import { EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
 import { numCut } from '../../utils/numCut'
 import { useRouter } from '../../utils/userouter'
 import {
@@ -29,28 +30,35 @@ import type { ResponseGetCurrencies } from './ExchangeRequests'
 import { Decimal } from 'decimal.js'
 
 export const ExchangePage = () => {
-  const [currencyFrom, setCurrencyFrom] = useState(CURRENCY_OPTIONS[0])
-  const [currencyTo, setCurrencyTo] = useState(CURRENCY_OPTIONS[1])
-  const [amountFrom, setAmountFrom] = useState('0')
-  const [amountTo, setAmountTo] = useState('0')
-  const [purposePay, setPurposePay] = useState('')
-  const [email, setEmail] = useState('')
-  const [currenciesAPI, setCurrenciesAPI] = useState<ResponseGetCurrencies>({})
-  const [courseFrom, setCourseFrom] = useState('0')
-  const [courseTo, setCourseTo] = useState('0')
-  const [maxFrom, setMaxFrom] = useState('0')
-  const [maxTo, setMaxTo] = useState('0')
-  const [minFrom, setMinFrom] = useState('0')
-  const [minTo, setMinTo] = useState('0')
-  const [exhangerFee, setExhangerFee] = useState('0')
-  const [mainersFee, setMainersFee] = useState('0')
+  const { currencyFrom, setCurrencyFrom } = useGlobalStore()
+  const { currencyTo, setCurrencyTo } = useGlobalStore()
+
+  const { amountFrom, setAmountFrom } = useGlobalStore()
+  const { amountTo, setAmountTo } = useGlobalStore()
+
+  const { purposePay, setPurposePay } = useGlobalStore()
+  const { email, setEmail } = useGlobalStore()
+
+  const { currenciesAPI, setCurrenciesAPI } = useGlobalStore()
+  const { courseFrom, setCourseFrom } = useGlobalStore()
+  const { courseTo, setCourseTo } = useGlobalStore()
+
+  const { maxFrom, setMaxFrom } = useGlobalStore()
+  const { maxTo, setMaxTo } = useGlobalStore()
+
+  const { minFrom, setMinFrom } = useGlobalStore()
+  const { minTo, setMinTo } = useGlobalStore()
+
+  const { exhangerFee, setExhangerFee } = useGlobalStore()
+  const { mainersFee, setMainersFee } = useGlobalStore()
+  const { isEmpty, setIsEmpty } = useGlobalStore()
+
   const [isReversing, setIsReversing] = useState(false)
   const [isAmountConvertFrom, setIsAmountConvertFrom] = useState(false)
   const [isAmountConvertTo, setIsAmountConvertTo] = useState(false)
   const [isShowFee, setIsShowFee] = useState(true)
   const [isKYC, setIsKYC] = useState(true)
   const [isAML, setIsAML] = useState(true)
-  const [isEmpty, setIsEmpty] = useState<Record<string, boolean>>({})
   const [isSubmit, setIsSubmit] = useState(false)
   const { push } = useRouter()
 
@@ -112,10 +120,7 @@ export const ExchangePage = () => {
         if (isError) newEmptyState[key] = false
       }
 
-      setIsEmpty((prev) => ({
-        ...prev,
-        ...newEmptyState
-      }))
+      setIsEmpty({ ...isEmpty, ...newEmptyState })
     }
   }
 
@@ -126,22 +131,25 @@ export const ExchangePage = () => {
   ) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = defaultZero && e.target.value === '' ? '0' : e.target.value
-      const isEmpty = value == '' || value == '0'
+      const isEmp = value == '' || value == '0'
 
       setFunc(value)
-      setIsEmpty((prev) => ({ ...prev, [key]: isEmpty }))
+      setIsEmpty({
+        ...isEmpty,
+        [key]: isEmp
+      })
     }
   }
 
-  const onInputInsert = (
-    setFunc: () => void,
-    key: string,
-  ) => {
+  const onInputInsert = (setFunc: () => void, key: string) => {
     return () => {
-      const isEmpty = false
+      const isEmp = false
 
       setFunc()
-      setIsEmpty((prev) => ({ ...prev, [key]: isEmpty }))
+      setIsEmpty({
+        ...isEmpty,
+        [key]: isEmp
+      })
     }
   }
 
@@ -149,8 +157,11 @@ export const ExchangePage = () => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       setFunc(e.target.checked)
       if (key) {
-        const isEmpty = !e.target.checked
-        setIsEmpty((prev) => ({ ...prev, [key]: isEmpty }))
+        const isEmp = !e.target.checked
+        setIsEmpty({
+          ...isEmpty,
+          [key]: isEmp
+        })
       }
     }
   }
