@@ -28,6 +28,9 @@ import { createTransaction, getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
 
 import { Decimal } from 'decimal.js'
+import { onInputChange } from '../../utils/onInputChange'
+import { onCheckboxChange } from '../../utils/onCheckboxChange'
+import { onInputInsert } from '../../utils/onInputInsert'
 
 export const ExchangePage = () => {
   const { currencyFrom, setCurrencyFrom } = useGlobalStore()
@@ -121,48 +124,6 @@ export const ExchangePage = () => {
       }
 
       setIsEmpty({ ...isEmpty, ...newEmptyState })
-    }
-  }
-
-  const onInputChange = (
-    setFunc: (value: string) => void,
-    key: string,
-    defaultZero: boolean = false
-  ) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = defaultZero && e.target.value === '' ? '0' : e.target.value
-      const isEmp = value == '' || value == '0'
-
-      setFunc(value)
-      setIsEmpty({
-        ...isEmpty,
-        [key]: isEmp
-      })
-    }
-  }
-
-  const onInputInsert = (setFunc: () => void, key: string) => {
-    return () => {
-      const isEmp = false
-
-      setFunc()
-      setIsEmpty({
-        ...isEmpty,
-        [key]: isEmp
-      })
-    }
-  }
-
-  const onCheckboxChange = (setFunc: (value: boolean) => void, key?: string) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFunc(e.target.checked)
-      if (key) {
-        const isEmp = !e.target.checked
-        setIsEmpty({
-          ...isEmpty,
-          [key]: isEmp
-        })
-      }
     }
   }
 
