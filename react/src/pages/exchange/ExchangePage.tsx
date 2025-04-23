@@ -12,12 +12,8 @@ import { MinMaxContainer } from '../../components/MinMaxContainer'
 import { MiniButton } from '../../components/MiniButton'
 import { ReverseButton } from '../../components/ReverseButton'
 import { ValidationInput } from '../../components/ValidationInput'
-import { EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
+import { CURRENCY_OPTIONS, EX_FEE, MAX, MIN, TX_FEE } from '../../constanst'
 import { numCut } from '../../utils/numCut'
-import { onCheckboxChange } from '../../utils/onCheckboxChange'
-import { onInputChange } from '../../utils/onInputChange'
-import { onInputInsert } from '../../utils/onInputInsert'
-import { useGlobalStore } from '../../utils/useGlobalStore'
 import {
   isValidAmountFrom,
   isValidAmountTo,
@@ -26,17 +22,15 @@ import {
   isValidPurposePay,
   isValidUSDTToBTC
 } from '../../validations'
-import { getCurrencies } from './ExchangeRequests'
+import { createTransaction, getCurrencies } from './ExchangeRequests'
 import type { ResponseGetCurrencies } from './ExchangeRequests'
-import { useCurrencyReverse } from './useCurrencyReverse'
-import { useSendTransaction } from './useSendTransaction'
-import { useStartExchangeSubmit } from './useStartExchangeSubmit'
 
 import { Decimal } from 'decimal.js'
+import { useRouter } from '../../utils/userouter'
 
 export const ExchangePage = () => {
-  const [currencyFrom, setCurrencyFrom] = useState(CURRENCY_OPTIONS[0])
-  const [currencyTo, setCurrencyTo] = useState(CURRENCY_OPTIONS[1])
+  const [currencyFrom, setCurrencyFrom] = useState(CURRENCY_OPTIONS[1])
+  const [currencyTo, setCurrencyTo] = useState(CURRENCY_OPTIONS[0])
   const [amountFrom, setAmountFrom] = useState('0')
   const [amountTo, setAmountTo] = useState('0')
   const [purposePay, setPurposePay] = useState('')
@@ -57,6 +51,8 @@ export const ExchangePage = () => {
   const [isKYC, setIsKYC] = useState(true)
   const [isAML, setIsAML] = useState(true)
   const [isSubmit, setIsSubmit] = useState(false)
+  const [isEmpty, setIsEmpty] = useState<Record<string, boolean>>({})
+
   const { push } = useRouter()
 
   const { curr: currFrom, currColor: currColorFrom, currBorder: currBorderFrom } = currencyFrom
@@ -117,7 +113,10 @@ export const ExchangePage = () => {
         if (isError) newEmptyState[key] = false
       }
 
-      setIsEmpty({ ...isEmpty, ...newEmptyState })
+      setIsEmpty((prev) => ({
+        ...prev,
+        ...newEmptyState
+      }))
     }
   }
 
@@ -131,10 +130,7 @@ export const ExchangePage = () => {
       const isEmp = value == '' || value == '0'
 
       setFunc(value)
-      setIsEmpty({
-        ...isEmpty,
-        [key]: isEmp
-      })
+      setIsEmpty((prev) => ({ ...prev, [key]: isEmp }))
     }
   }
 
@@ -155,10 +151,7 @@ export const ExchangePage = () => {
       setFunc(e.target.checked)
       if (key) {
         const isEmp = !e.target.checked
-        setIsEmpty({
-          ...isEmpty,
-          [key]: isEmp
-        })
+        setIsEmpty((prev) => ({ ...prev, [key]: isEmp }))
       }
     }
   }
